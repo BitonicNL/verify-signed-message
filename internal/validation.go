@@ -4,19 +4,19 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/btcsuite/btcd/btcutil"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/txscript"
-	"github.com/btcsuite/btcutil"
-	"github.com/thoas/go-funk"
+	"github.com/samber/lo"
 
 	"github.com/bitonicnl/verify-signed-message/internal/flags"
 )
 
 func ValidateP2PKH(recoveryFlag int, pubkeyHash []byte, addr btcutil.Address, net *chaincfg.Params) (bool, error) {
 	// Ensure proper address was generated
-	if funk.ContainsInt(flags.TrezorP2WPKHAndP2SH(), recoveryFlag) {
+	if lo.Contains[int](flags.TrezorP2WPKHAndP2SH(), recoveryFlag) {
 		return false, errors.New("cannot use P2PKH for recovery flag 'BIP137 (Trezor) P2WPKH-P2SH'")
-	} else if funk.ContainsInt(flags.TrezorP2WPKH(), recoveryFlag) {
+	} else if lo.Contains[int](flags.TrezorP2WPKH(), recoveryFlag) {
 		return false, errors.New("cannot use P2PKH for recovery flag 'BIP137 (Trezor) P2WPKH'")
 	}
 
@@ -31,9 +31,9 @@ func ValidateP2PKH(recoveryFlag int, pubkeyHash []byte, addr btcutil.Address, ne
 
 func ValidateP2SH(recoveryFlag int, pubkeyHash []byte, addr btcutil.Address, net *chaincfg.Params) (bool, error) {
 	// Ensure proper address was generated
-	if funk.ContainsInt(flags.Uncompressed(), recoveryFlag) {
+	if lo.Contains[int](flags.Uncompressed(), recoveryFlag) {
 		return false, errors.New("cannot use P2SH for recovery flag 'P2PKH uncompressed'")
-	} else if funk.ContainsInt(flags.TrezorP2WPKH(), recoveryFlag) {
+	} else if lo.Contains[int](flags.TrezorP2WPKH(), recoveryFlag) {
 		return false, errors.New("cannot use P2SH for recovery flag 'BIP137 (Trezor) P2WPKH'")
 	}
 
@@ -50,7 +50,7 @@ func ValidateP2SH(recoveryFlag int, pubkeyHash []byte, addr btcutil.Address, net
 
 func ValidateP2WPKH(recoveryFlag int, pubkeyHash []byte, addr btcutil.Address, net *chaincfg.Params) (bool, error) {
 	// Ensure proper address was generated
-	if funk.ContainsInt(flags.Uncompressed(), recoveryFlag) {
+	if lo.Contains[int](flags.Uncompressed(), recoveryFlag) {
 		return false, errors.New("cannot use P2WPKH for recovery flag 'P2PKH uncompressed'")
 	}
 

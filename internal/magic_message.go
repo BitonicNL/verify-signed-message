@@ -7,14 +7,14 @@ import (
 )
 
 // varIntProtoVer is the protocol version to use for serializing N as a VarInt
-// Copied from https://github.com/btcsuite/btcutil/blob/master/gcs/gcs.go#L37
+// Copied from https://github.com/btcsuite/btcd/blob/v0.23.3/btcutil/gcs/gcs.go#L37
 const varIntProtoVer uint32 = 0
 
 // Signed message are prepended with this magicMessage
 // Taken from https://bitcoin.stackexchange.com/a/77325
 const magicMessage = "\x18Bitcoin Signed Message:\n"
 
-// WriteVarInt copied from https://github.com/btcsuite/btcutil/blob/master/gcs/gcs.go#L225
+// CreateMagicMessage builds a properly signed message.
 func CreateMagicMessage(message string) string {
 	buffer := bytes.Buffer{}
 	buffer.Grow(wire.VarIntSerializeSize(uint64(len(message))))

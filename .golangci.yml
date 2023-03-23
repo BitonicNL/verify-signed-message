@@ -3,7 +3,14 @@ linters-settings:
   dupl:
     threshold: 100
   gci:
-    local-prefixes: github.com/golangci/golangci-lint
+    sections:
+      - standard
+      - default
+      - prefix(github.com/bitonicnl/verify-signed-message)
+      - blank
+      - dot
+    skip-generated: false
+    custom-order: true
   goconst:
     min-len: 2
     min-occurrences: 2
@@ -21,14 +28,7 @@ linters-settings:
       - whyNoLint
       - wrapperFunc
   goimports:
-    local-prefixes: github.com/golangci/golangci-lint
-  golint:
-    min-confidence: 0
-  gomnd:
-    settings:
-      mnd:
-        # don't include the "operation" and "assign"
-        checks: argument,case,condition,return
+    local-prefixes: github.com/bitonicnl/verify-signed-message
   govet:
     check-shadowing: true
     settings:
@@ -38,86 +38,87 @@ linters-settings:
           - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
           - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
           - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
-  maligned:
-    suggest-new: true
   misspell:
     locale: US
-  nolintlint:
-    allow-leading-space: true # don't require machine-readable nolint directives (i.e. with no leading space)
-    allow-unused: false # report any unused nolint directives
-    require-explanation: false # don't require an explanation for nolint directives
-    require-specific: false # don't require nolint directives to be specific about which linter is being skipped
 
 linters:
-
   enable:
+    - asasalint
+    - bidichk
     - bodyclose
-    - deadcode
+    - decorder
     - depguard
     - dogsled
     - dupl
     - errcheck
+    - errchkjson
+    - errorlint
     - exhaustive
+    - exhaustruct
+    - exportloopref
+    - forbidigo
+    - gci
     - gochecknoinits
+    - gocognit
     - goconst
     - gocritic
     - gocyclo
+    - godot
+    - godox
     - gofmt
+    - gofumpt
+    - goheader
     - goimports
-    - golint
+    - gomoddirectives
+    - gomodguard
     - goprintffuncname
     - gosec
     - gosimple
     - govet
+    - grouper
     - ineffassign
-    - interfacer
+    - interfacebloat
+    - ireturn
+    - loggercheck
+    - maintidx
+    - makezero
     - misspell
     - nakedret
-    - noctx
+    - nestif
+    - nilnil
+    - nlreturn
     - nolintlint
-    - rowserrcheck
-    - scopelint
+    - nonamedreturns
+    - paralleltest
+    - prealloc
+    - predeclared
+    - promlinter
+    - reassign
+    - revive
     - staticcheck
-    - structcheck
     - stylecheck
+    - tagliatelle
+    - tenv
+    - testpackage
+    - thelper
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
+    - usestdlibvars
     - whitespace
-
-  # don't enable:
-  # - asciicheck
-  # - funlen
-  # - gochecknoglobals
-  # - gocognit
-  # - godot
-  # - godox
-  # - goerr113
-  # - gomnd
-  # - maligned
-  # - nestif
-  # - prealloc
-  # - testpackage
-  # - wsl
 
 issues:
   # Show only new issues: if there are unstaged changes or untracked files,
   # only those changes are analyzed, else only changes in HEAD~ are analyzed.
   new: false
 
-  # List of regexps of issue texts to exclude, empty list by default.
-  exclude:
-    # Ignore the `fmt.Stringer` interface suggestion from `interfacer`.
-    - fmt.Stringer
-
   # Excluding configuration per-path, per-linter, per-text and per-source
   exclude-rules:
     # Exclude some linters from running on tests files
     - path: _test\.go
       linters:
-        - scopelint
+        - exhaustruct
 
 # output configuration options
 output:

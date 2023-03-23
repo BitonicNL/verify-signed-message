@@ -1,6 +1,10 @@
 # Bitcoin Signed Message Verifier
 > A simple Golang package with a single purpose, to verify messages signed via Bitcoin message signing (BMS). 
 
+## Requirements
+
+- Golang 1.18+
+
 ## Installation
 
 Your `$PATH` must contain the Go path and the Go `bin` path (see [GoLang's getting started](https://golang.org/doc/install#install) for more information). 
@@ -57,10 +61,14 @@ This library tries to support as many signatures as possible.
 - Any wallet that follows [BIP 137](https://github.com/bitcoin/bips/blob/master/bip-0137.mediawiki), example:
   - Trezor: P2PKH, P2WPKH and P2WPKH-P2SH
 
+**Currently not supported:**
+- Pay-to-Witness-Script-Hash (P2WSH)
+- Taproot ([as there is no consensus](https://github.com/trezor/trezor-firmware/issues/1943))
+
 ## Contributing
 
 Contributions, issues and feature requests are welcome.
 
 ## License
 
-Copyright © 2020 Bitonic. This project is [ISC](/LICENSE) licensed.
+Copyright © 2022 Bitonic. This project is [ISC](/LICENSE) licensed.
