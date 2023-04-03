@@ -1,5 +1,14 @@
 # Bitcoin Signed Message Verifier
-> A simple Golang package with a single purpose, to verify messages signed via Bitcoin message signing (BMS). 
+
+[![tag](https://img.shields.io/github/tag/bitonicnl/verify-signed-message.svg)](https://github.com/bitonicnl/verify-signed-message/tags)
+![Go Version](https://img.shields.io/badge/Go-%3E%3D%201.18-%23007d9c)
+[![GoDoc](https://godoc.org/github.com/bitonicnl/verify-signed-message?status.svg)](https://pkg.go.dev/github.com/bitonicnl/verify-signed-message)
+![Build Status](https://github.com/bitonicnl/verify-signed-message/actions/workflows/test.yml/badge.svg)
+[![Go report](https://goreportcard.com/badge/github.com/bitonicnl/verify-signed-message)](https://goreportcard.com/report/github.com/bitonicnl/verify-signed-message)
+[![Contributors](https://img.shields.io/github/contributors/bitonicnl/verify-signed-message)](https://github.com/bitonicnl/verify-signed-message/graphs/contributors)
+[![License](https://img.shields.io/github/license/bitonicnl/verify-signed-message)](./LICENSE)
+
+> A simple Golang package with a single purpose, to verify messages signed via Bitcoin message signing (BMS).
 
 ## Requirements
 
@@ -65,10 +74,14 @@ This library tries to support as many signatures as possible.
 - Pay-to-Witness-Script-Hash (P2WSH)
 - Taproot ([as there is no consensus](https://github.com/trezor/trezor-firmware/issues/1943))
 
+## Development
+
+This package is developed in-house and pushed from our internal repository to GitHub.
+
 ## Contributing
 
 Contributions, issues and feature requests are welcome.
 
 ## License
 
-Copyright © 2022 Bitonic. This project is [ISC](/LICENSE) licensed.
+Copyright © 2020-2023 Bitonic. This project is [ISC](/LICENSE) licensed.

@@ -27,7 +27,9 @@ const (
 	compactSigCompPubKey = 4
 )
 
-// ParseCompact is taken from `ecdsa.RecoverCompact` as this part is not exposed anywhere else.
+// ParseCompact attempts to recover the ecdsa.Signature from the provided
+// compact signature. The logic for this was taken from `ecdsa.RecoverCompact`
+// as it is not exposed publicly.
 func ParseCompact(signature []byte) (*ecdsa.Signature, error) {
 	// A compact signature consists of a recovery byte followed by the R and
 	// S components serialized as 32-byte big-endian values.
@@ -64,7 +66,7 @@ func ParseCompact(signature []byte) (*ecdsa.Signature, error) {
 	return ecdsa.NewSignature(&r, &s), nil
 }
 
-// Verify checks if the signature for the message hash is valid for the public key given.
+// Verify ensures that the signature for the message hash is valid for the public key given.
 func Verify(signatureEncoded []byte, publicKey *btcec.PublicKey, messageHash []byte) error {
 	if publicKey == nil || !publicKey.IsOnCurve() {
 		return errors.New("public key was not correctly instantiated")

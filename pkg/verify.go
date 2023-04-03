@@ -18,15 +18,15 @@ import (
 	"github.com/bitonicnl/verify-signed-message/internal/signature"
 )
 
-// All signed messages are expected to have a fixed signature length.
+// ExpectedSignatureLength contains the fixed signature length all signed messages are expected to have.
 const ExpectedSignatureLength = 65
 
-// Verify will verify a Signature based on the recovery flag on Bitcoin main network.
+// Verify will verify a SignedMessage based on the recovery flag on Bitcoin main network.
 func Verify(sig SignedMessage) (bool, error) {
 	return VerifyWithChain(sig, &chaincfg.MainNetParams)
 }
 
-// VerifyWithChain will either return true if the signature is valid or an error.
+// VerifyWithChain will verify a SignedMessage based on the recovery flag on the passed network.
 func VerifyWithChain(signedMessage SignedMessage, net *chaincfg.Params) (bool, error) {
 	// Check if message contains spaces that can be trimmed, if so run the verification with the trimmed message
 	// This is required because Electrum trims messages before signing
