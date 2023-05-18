@@ -111,6 +111,11 @@ func VerifyWithChain(signedMessage SignedMessage, net *chaincfg.Params) (bool, e
 		return internal.ValidateP2WPKH(recoveryFlag, publicKeyHash, address, net)
 	}
 
+	// Validate P2TR
+	if _, ok := address.(*btcutil.AddressTaproot); ok {
+		return internal.ValidateP2TR(recoveryFlag, publicKey, address, net)
+	}
+
 	// Catch all, should never happen
 	return false, fmt.Errorf("unexpected address type '%s'", reflect.TypeOf(address))
 }
