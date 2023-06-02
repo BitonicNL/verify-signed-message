@@ -47,9 +47,9 @@ jobs:
           args: --timeout 200s --build-tags=musl
 
       - name: Golang Vulncheck
-        uses: Templum/govulncheck-action@v0.10.0
+        uses: Templum/govulncheck-action@v0.10.1
         with:
-          go-version: 1.18
+          go-version: latest
           vulncheck-version: latest
           fail-on-vuln: true
           package: ./...
