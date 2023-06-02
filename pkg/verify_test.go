@@ -293,6 +293,12 @@ func (s *VerifyTestSuite) TestVerify() {
 			Message:   " Lorem ipsum dolor sit amet, consectetur adipiscing elit. In a turpis dignissim, tincidunt dolor quis, aliquam justo. Sed eleifend eleifend tempus. Sed blandit lectus at ullamcorper blandit. Quisque suscipit ligula lacus, tempor fringilla erat pharetra a. Curabitur pretium varius purus vel luctus. Donec fringilla velit vel risus fermentum, ac aliquam enim sollicitudin. Aliquam elementum, nunc nec malesuada fringilla, sem sem lacinia libero, id tempus nunc velit nec dui. Vestibulum gravida non tortor sit amet accumsan. Nunc semper vehicula vestibulum. Praesent at nibh dapibus, eleifend neque vitae, vehicula justo. Nam ultricies at orci vel laoreet. Morbi metus sapien, pulvinar ut dui ut, malesuada lobortis odio. Curabitur eget diam ligula. Nunc vel nisl consectetur, elementum magna et, elementum erat. Maecenas risus massa, mattis a sapien sed, molestie ullamcorper sapien. ",
 			Signature: "HHOGSz6AUEEyVGoCUw1GqQ5qy9KvW5uO1FfqWLbwYxkQVsI+sbM0jpBQWkyjr72166yiL/LQEtW3SpVBR1gXdYY=",
 		},
+		// Generated via https://unisat.io/ which uses https://github.com/bitpay/bitcore
+		"p2tr": {
+			Address:   "bc1pg48rw0vphy9mght5dr8s5prx92a44wpqmzk67xk8yjf5zlancj9sa3plhc",
+			Message:   "this is a random message",
+			Signature: "G5Q4LobfmVKN4+CG/QF8r2mVBWE14nhbczdHWiCHaS8OcqUUzWF8A/chCyQbr95r1aG4TwUi6PZ01hDrtuuypmk=",
+		},
 	}
 
 	for i := range tests {

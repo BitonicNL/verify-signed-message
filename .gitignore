@@ -4,6 +4,7 @@
 # Folders
 /coverage/
 /reports/
+/.example/vendor
 
 ### Go ###
 # Binaries for programs and plugins
@@ -22,3 +23,5 @@
 ### Go Patch ###
 /vendor/
 /Godeps/
+.idea
+.vscode

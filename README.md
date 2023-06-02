@@ -25,35 +25,7 @@ go get -u github.com/bitonicnl/verify-signed-message
 
 ## Usage
 
-```go
-package main
-
-import (
-    "fmt"
-    
-    "github.com/btcsuite/btcd/chaincfg"
-
-    "github.com/bitonicnl/verify-signed-message/pkg"
-)
-
-func main()  {
-    // Bitcoin Mainnet
-    fmt.Println(verifier.Verify(verifier.SignedMessage{
-        Address:   "18J72YSM9pKLvyXX1XAjFXA98zeEvxBYmw",
-        Message:   "Test123",
-        Signature: "Gzhfsw0ItSrrTCChykFhPujeTyAcvVxiXwywxpHmkwFiKuUR2ETbaoFcocmcSshrtdIjfm8oXlJoTOLosZp3Yc8=",
-    }))
-
-    // Bitcoin Testnet3
-    fmt.Println(verifier.VerifyWithChain(verifier.SignedMessage{
-        Address:   "tb1qr97cuq4kvq7plfetmxnl6kls46xaka78n2288z",
-        Message:   "The outage comes at a time when bitcoin has been fast approaching new highs not seen since June 26, 2019.",
-        Signature: "H/bSByRH7BW1YydfZlEx9x/nt4EAx/4A691CFlK1URbPEU5tJnTIu4emuzkgZFwC0ptvKuCnyBThnyLDCqPqT10=",
-    }, &chaincfg.TestNet3Params))
-}
-```
-
-In this example it will output `true, <nil>`, since the signature is valid and there are no errors.
+For examples, checkout the [example](/.example) folder.
 
 ## Support
 
@@ -69,10 +41,12 @@ This library tries to support as many signatures as possible.
   - Bitcoin Core
 - Any wallet that follows [BIP 137](https://github.com/bitcoin/bips/blob/master/bip-0137.mediawiki), example:
   - Trezor: P2PKH, P2WPKH and P2WPKH-P2SH
+- Taproot (P2TR)
+  - The verification is using the internal key, so only addresses without a tapscript are allowed.
 
 **Currently not supported:**
 - Pay-to-Witness-Script-Hash (P2WSH)
-- Taproot ([as there is no consensus](https://github.com/trezor/trezor-firmware/issues/1943))
+- BIP-322
 
 ## Development
 

@@ -27,6 +27,7 @@ func Verify(sig SignedMessage) (bool, error) {
 }
 
 // VerifyWithChain will verify a SignedMessage based on the recovery flag on the passed network.
+// Supported address types are P2PKH, P2WKH, NP2WKH (P2WPKH), P2TR.
 func VerifyWithChain(signedMessage SignedMessage, net *chaincfg.Params) (bool, error) {
 	// Check if message contains spaces that can be trimmed, if so run the verification with the trimmed message
 	// This is required because Electrum trims messages before signing
@@ -96,21 +97,21 @@ func VerifyWithChain(signedMessage SignedMessage, net *chaincfg.Params) (bool, e
 	// Get the hash from the public key, so we can check that address matches
 	publicKeyHash := internal.GeneratePublicKeyHash(recoveryFlag, publicKey)
 
+	switch address.(type) {
 	// Validate P2PKH
-	if _, ok := address.(*btcutil.AddressPubKeyHash); ok {
+	case *btcutil.AddressPubKeyHash:
 		return internal.ValidateP2PKH(recoveryFlag, publicKeyHash, address, net)
-	}
-
 	// Validate P2SH
-	if _, ok := address.(*btcutil.AddressScriptHash); ok {
+	case *btcutil.AddressScriptHash:
 		return internal.ValidateP2SH(recoveryFlag, publicKeyHash, address, net)
-	}
-
 	// Validate P2WPKH
-	if _, ok := address.(*btcutil.AddressWitnessPubKeyHash); ok {
+	case *btcutil.AddressWitnessPubKeyHash:
 		return internal.ValidateP2WPKH(recoveryFlag, publicKeyHash, address, net)
+	// Validate P2TR
+	case *btcutil.AddressTaproot:
+		return internal.ValidateP2TR(recoveryFlag, publicKey, address, net)
+	// Unsupported address
+	default:
+		return false, fmt.Errorf("unsupported address type '%s'", reflect.TypeOf(address))
 	}
-
-	// Catch all, should never happen
-	return false, fmt.Errorf("unexpected address type '%s'", reflect.TypeOf(address))
 }
