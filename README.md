@@ -57,4 +57,4 @@ Contributions, issues and feature requests are welcome.
 
 ## License
 
-Copyright © 2020-2023 Bitonic. This project is [ISC](/LICENSE) licensed.
+Copyright © 2020-2024 Bitonic. This project is [ISC](/LICENSE) licensed.

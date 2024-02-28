@@ -93,6 +93,33 @@ func (s *VerifyTestSuite) TestVerifyIncorrect() {
 			},
 			expectedError: "wrong signature length: 17 instead of 65",
 		},
+		// Generated via https://demo.unisat.io/ and has an invalid recovery flag, which causes it to be generated uncompressed (the address is compressed).
+		"unisat - P2PKH": {
+			signedMessage: verifier.SignedMessage{
+				Address:   "15tbg628HntFEB7xjyVrSo3ck5jbKuGhQD",
+				Message:   "hello world",
+				Signature: "G5WBoAY8ehQtP8UnS2boqjid2vYxH2/m69Il3T1SySRGVO2H1KIrTwVkPe2aU3BXyX/CYzBUaXYyWmC8vxXFIyw=",
+			},
+			expectedError: "generated address '1NAnF6TPUieShRuhVyK5nYAGpvGwXSS7RX' does not match expected address '15tbg628HntFEB7xjyVrSo3ck5jbKuGhQD'",
+		},
+		// Generated via https://demo.unisat.io/ and has an invalid recovery flag.
+		"unisat - P2WPKH-P2SH": {
+			signedMessage: verifier.SignedMessage{
+				Address:   "32ypXz5xwzGLbEnfLJWw1VUKcLbvDDVTVV",
+				Message:   "hello world",
+				Signature: "HEZseoQ4aMFs8ERwwB9jm4qgoUH/sFRMTEADV9pr5EQadve7ebbsQ/LH/c7QpnDY/ygi24jlnPoZUcOT7Vo8vOw=",
+			},
+			expectedError: "cannot use P2SH for recovery flag 'P2PKH uncompressed'",
+		},
+		// Generated via https://demo.unisat.io/ and has an invalid recovery flag.
+		"unisat - P2WPKH": {
+			signedMessage: verifier.SignedMessage{
+				Address:   "bc1qzex95t5x94sq70g8u7zyc5jcn6vv27swtm5uqs",
+				Message:   "hello world",
+				Signature: "HCxsLSgGi9RduaXTTzQvbpTNVR/KyWX9Rk4SU0LnhXN8T+A+8titHwMZea2PiOSQzfSu2J+og307rEw2GRZDeDE=",
+			},
+			expectedError: "cannot use P2WPKH for recovery flag 'P2PKH uncompressed'",
+		},
 	}
 
 	for name, tt := range tests {
@@ -293,8 +320,8 @@ func (s *VerifyTestSuite) TestVerify() {
 			Message:   " Lorem ipsum dolor sit amet, consectetur adipiscing elit. In a turpis dignissim, tincidunt dolor quis, aliquam justo. Sed eleifend eleifend tempus. Sed blandit lectus at ullamcorper blandit. Quisque suscipit ligula lacus, tempor fringilla erat pharetra a. Curabitur pretium varius purus vel luctus. Donec fringilla velit vel risus fermentum, ac aliquam enim sollicitudin. Aliquam elementum, nunc nec malesuada fringilla, sem sem lacinia libero, id tempus nunc velit nec dui. Vestibulum gravida non tortor sit amet accumsan. Nunc semper vehicula vestibulum. Praesent at nibh dapibus, eleifend neque vitae, vehicula justo. Nam ultricies at orci vel laoreet. Morbi metus sapien, pulvinar ut dui ut, malesuada lobortis odio. Curabitur eget diam ligula. Nunc vel nisl consectetur, elementum magna et, elementum erat. Maecenas risus massa, mattis a sapien sed, molestie ullamcorper sapien. ",
 			Signature: "HHOGSz6AUEEyVGoCUw1GqQ5qy9KvW5uO1FfqWLbwYxkQVsI+sbM0jpBQWkyjr72166yiL/LQEtW3SpVBR1gXdYY=",
 		},
-		// Generated via https://unisat.io/ which uses https://github.com/bitpay/bitcore
-		"p2tr": {
+		// Generated via https://demo.unisat.io/ which uses https://github.com/bitpay/bitcore
+		"unisat - p2tr": {
 			Address:   "bc1pg48rw0vphy9mght5dr8s5prx92a44wpqmzk67xk8yjf5zlancj9sa3plhc",
 			Message:   "this is a random message",
 			Signature: "G5Q4LobfmVKN4+CG/QF8r2mVBWE14nhbczdHWiCHaS8OcqUUzWF8A/chCyQbr95r1aG4TwUi6PZ01hDrtuuypmk=",

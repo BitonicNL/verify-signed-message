@@ -21,15 +21,15 @@ func ElectrumP2WPKHAndP2SH() []int {
 }
 
 // GetKeyID returns the Key ID for a specified recovery flag
-// Taken from https://github.com/btclib-org/btclib/blob/v2023.2.3/btclib/ecc/bms.py#L303
+// Taken from https://github.com/btclib-org/btclib/blob/v2023.7.12/btclib/ecc/bms.py#L302
 func GetKeyID(recoveryFlag int) int {
 	return (recoveryFlag - 27) & 0b11
 }
 
 // ShouldBeCompressed returns if a recovery flag signals a compressed key
-// Taken from https://github.com/btclib-org/btclib/blob/v2023.2.3/btclib/ecc/bms.py#L306
+// Taken from https://github.com/btclib-org/btclib/blob/v2023.7.12/btclib/ecc/bms.py#L305
 func ShouldBeCompressed(recoveryFlag int) bool {
-	return recoveryFlag >= 31
+	return recoveryFlag > 30
 }
 
 // Trezor returns all recovery flags related to Trezor.
