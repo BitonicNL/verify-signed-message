@@ -21,43 +21,40 @@ linters-settings:
       - opinionated
       - performance
       - style
-    disabled-checks:
-      - dupImport # https://github.com/go-critic/go-critic/issues/845
-      - ifElseChain
-      - octalLiteral
-      - whyNoLint
-      - wrapperFunc
   goimports:
     local-prefixes: github.com/bitonicnl/verify-signed-message
-  govet:
-    check-shadowing: true
-    settings:
-      printf:
-        funcs:
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
   misspell:
     locale: US
 
 linters:
   enable:
     - asasalint
+    - asciicheck
     - bidichk
     - bodyclose
+    - containedctx
+    - contextcheck
     - decorder
     - dogsled
     - dupl
+    - dupword
+    - durationcheck
     - errcheck
     - errchkjson
+    - errname
     - errorlint
+    - execinquery
     - exhaustive
     - exhaustruct
     - exportloopref
     - forbidigo
+    - forcetypeassert
     - gci
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecknoglobals
     - gochecknoinits
+    - gochecksumtype
     - gocognit
     - goconst
     - gocritic
@@ -73,39 +70,59 @@ linters:
     - goprintffuncname
     - gosec
     - gosimple
+    - gosmopolitan
     - govet
     - grouper
+    - importas
+    - inamedparam
     - ineffassign
     - interfacebloat
     - ireturn
     - loggercheck
     - maintidx
     - makezero
+    - mirror
     - misspell
+    - musttag
     - nakedret
     - nestif
+    - nilerr
     - nilnil
     - nlreturn
+    - noctx
     - nolintlint
     - nonamedreturns
+    - nosprintfhostport
     - paralleltest
+    - perfsprint
     - prealloc
     - predeclared
     - promlinter
+    - protogetter
     - reassign
     - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
     - staticcheck
     - stylecheck
+    - tagalign
     - tagliatelle
     - tenv
+    - testableexamples
+    - testifylint
     - testpackage
     - thelper
+    - tparallel
     - typecheck
     - unconvert
     - unparam
     - unused
     - usestdlibvars
+    - wastedassign
     - whitespace
+    - zerologlint
 
 issues:
   # Show only new issues: if there are unstaged changes or untracked files,
@@ -117,12 +134,13 @@ issues:
     # Exclude some linters from running on tests files
     - path: _test\.go
       linters:
+        - dupword
         - exhaustruct
 
 # output configuration options
 output:
   # colored-line-number|line-number|json|tab|checkstyle|code-climate, default is "colored-line-number"
-  format: colored-line-number
+  formats: [ { format: colored-line-number } ]
 
   # print lines of code with issue, default is true
   print-issued-lines: true

@@ -3,7 +3,6 @@ package flags_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitonicnl/verify-signed-message/internal/flags"
@@ -21,19 +20,19 @@ func TestRecoveryFlagTestSuite(t *testing.T) {
 }
 
 func (s *RecoveryFlagTestSuite) TestAll() {
-	require.Equal(s.T(), []int{27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42}, flags.All())
+	s.Equal([]int{27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42}, flags.All())
 }
 
 func (s *RecoveryFlagTestSuite) TestCompressed() {
-	require.Equal(s.T(), []int{31, 32, 33, 34}, flags.Compressed())
+	s.Equal([]int{31, 32, 33, 34}, flags.Compressed())
 }
 
 func (s *RecoveryFlagTestSuite) TestElectrumP2WPKH() {
-	require.Equal(s.T(), []int{31, 32, 33, 34}, flags.ElectrumP2WPKH())
+	s.Equal([]int{31, 32, 33, 34}, flags.ElectrumP2WPKH())
 }
 
 func (s *RecoveryFlagTestSuite) TestElectrumP2WPKHAndP2SH() {
-	require.Equal(s.T(), []int{31, 32, 33, 34}, flags.ElectrumP2WPKHAndP2SH())
+	s.Equal([]int{31, 32, 33, 34}, flags.ElectrumP2WPKHAndP2SH())
 }
 
 func (s *RecoveryFlagTestSuite) TestGetKeyID() {
@@ -80,17 +79,17 @@ func (s *RecoveryFlagTestSuite) TestShouldBeCompressed() {
 }
 
 func (s *RecoveryFlagTestSuite) TestTrezor() {
-	require.Equal(s.T(), []int{35, 36, 37, 38, 39, 40, 41, 42}, flags.Trezor())
+	s.Equal([]int{35, 36, 37, 38, 39, 40, 41, 42}, flags.Trezor())
 }
 
 func (s *RecoveryFlagTestSuite) TestTrezorP2WPKH() {
-	require.Equal(s.T(), []int{39, 40, 41, 42}, flags.TrezorP2WPKH())
+	s.Equal([]int{39, 40, 41, 42}, flags.TrezorP2WPKH())
 }
 
 func (s *RecoveryFlagTestSuite) TestTrezorP2WPKHAndP2SH() {
-	require.Equal(s.T(), []int{35, 36, 37, 38}, flags.TrezorP2WPKHAndP2SH())
+	s.Equal([]int{35, 36, 37, 38}, flags.TrezorP2WPKHAndP2SH())
 }
 
 func (s *RecoveryFlagTestSuite) TestUncompressed() {
-	require.Equal(s.T(), []int{27, 28, 29, 30}, flags.Uncompressed())
+	s.Equal([]int{27, 28, 29, 30}, flags.Uncompressed())
 }

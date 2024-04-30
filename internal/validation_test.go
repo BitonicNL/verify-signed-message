@@ -2,6 +2,7 @@ package internal_test
 
 import (
 	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"testing"
 
@@ -16,11 +17,12 @@ import (
 	"github.com/bitonicnl/verify-signed-message/internal"
 )
 
-// Hash for 1DAag8qiPLHh6hMFVu9qJQm9ro1HtwuyK5, used in this test.
-var pubKeyHash = []uint8{133, 113, 93, 2, 177, 222, 121, 165, 69, 34, 61, 182, 122, 239, 165, 136, 229, 124, 167, 194}
-
 type ValidateTestSuite struct {
 	suite.Suite
+
+	legacyPubKeyHash      []uint8
+	compressedPublicKey   *btcec.PublicKey
+	uncompressedPublicKey *btcec.PublicKey
 }
 
 func TestValidateTestSuite(t *testing.T) {
@@ -28,6 +30,17 @@ func TestValidateTestSuite(t *testing.T) {
 	t.Parallel()
 
 	suite.Run(t, new(ValidateTestSuite))
+}
+
+func (s *ValidateTestSuite) SetupTest() {
+	// Compressed legacy public key in bytes (1DAag8qiPLHh6hMFVu9qJQm9ro1HtwuyK5)
+	s.legacyPubKeyHash = []uint8{133, 113, 93, 2, 177, 222, 121, 165, 69, 34, 61, 182, 122, 239, 165, 136, 229, 124, 167, 194}
+
+	// Compressed taproot public key in hexadecimal format (bc1pgc9k3vdmr9aecmwj09qg5qv550qyyrydufyfmxrsvk5474rxenuqrq4lcz)
+	s.compressedPublicKey = s.createTaprootPublicKey("0296f45e80c8efdb88b544afde38f2a19d65d40086cff9e2fdd5868d5eb57ca8a6")
+
+	// Uncompressed taproot public key in hexadecimal format (bc1pg48rw0vphy9mght5dr8s5prx92a44wpqmzk67xk8yjf5zlancj9sa3plhc)
+	s.uncompressedPublicKey = s.createTaprootPublicKey("04c78ea05297a242ba0b2b105bed475b8796fcea30638813f35989c4e0f1df9ef6")
 }
 
 func (s *ValidateTestSuite) TestValidateP2PKH() {
@@ -58,12 +71,12 @@ func (s *ValidateTestSuite) TestValidateP2PKH() {
 		},
 		{
 			name: "Invalid address for public key hash",
-			args: args{recoveryFlag: 32, pubKeyHash: pubKeyHash, addr: &RandomAddress{Address: "Invalid"}},
+			args: args{recoveryFlag: 32, pubKeyHash: s.legacyPubKeyHash, addr: &RandomAddress{Address: "Invalid"}},
 			want: errors.New("generated address '1DAag8qiPLHh6hMFVu9qJQm9ro1HtwuyK5' does not match expected address 'Invalid'"),
 		},
 		{
 			name: "Valid P2PKH",
-			args: args{recoveryFlag: 32, pubKeyHash: pubKeyHash, addr: &RandomAddress{Address: "1DAag8qiPLHh6hMFVu9qJQm9ro1HtwuyK5"}},
+			args: args{recoveryFlag: 32, pubKeyHash: s.legacyPubKeyHash, addr: &RandomAddress{Address: "1DAag8qiPLHh6hMFVu9qJQm9ro1HtwuyK5"}},
 			want: nil,
 		},
 	}
@@ -71,7 +84,7 @@ func (s *ValidateTestSuite) TestValidateP2PKH() {
 	for _, tt := range tests {
 		s.T().Run(tt.name, func(t *testing.T) {
 			_, err := internal.ValidateP2PKH(tt.args.recoveryFlag, tt.args.pubKeyHash, tt.args.addr, &chaincfg.MainNetParams)
-			require.Equal(t, err, tt.want)
+			require.Equal(t, tt.want, err)
 		})
 	}
 }
@@ -79,7 +92,7 @@ func (s *ValidateTestSuite) TestValidateP2PKH() {
 func (s *ValidateTestSuite) TestValidateP2SH() {
 	pubKeyHashTooLong := make([]uint8, txscript.MaxScriptSize+2)
 	_, err := rand.Read(pubKeyHashTooLong)
-	require.NoError(s.T(), err)
+	s.Require().NoError(err)
 
 	type args struct {
 		recoveryFlag int
@@ -108,12 +121,12 @@ func (s *ValidateTestSuite) TestValidateP2SH() {
 		},
 		{
 			name: "Invalid address for public key hash",
-			args: args{recoveryFlag: 35, pubKeyHash: pubKeyHash, addr: &RandomAddress{Address: "Invalid"}},
+			args: args{recoveryFlag: 35, pubKeyHash: s.legacyPubKeyHash, addr: &RandomAddress{Address: "Invalid"}},
 			want: errors.New("generated address '3Nxee1CFDqFRtUrixREpNMhsmH9TBXcY48' does not match expected address 'Invalid'"),
 		},
 		{
 			name: "Valid P2SH",
-			args: args{recoveryFlag: 35, pubKeyHash: pubKeyHash, addr: &RandomAddress{Address: "3Nxee1CFDqFRtUrixREpNMhsmH9TBXcY48"}},
+			args: args{recoveryFlag: 35, pubKeyHash: s.legacyPubKeyHash, addr: &RandomAddress{Address: "3Nxee1CFDqFRtUrixREpNMhsmH9TBXcY48"}},
 			want: nil,
 		},
 	}
@@ -121,7 +134,7 @@ func (s *ValidateTestSuite) TestValidateP2SH() {
 	for _, tt := range tests {
 		s.T().Run(tt.name, func(t *testing.T) {
 			_, err := internal.ValidateP2SH(tt.args.recoveryFlag, tt.args.pubKeyHash, tt.args.addr, &chaincfg.MainNetParams)
-			require.Equal(t, err, tt.want)
+			require.Equal(t, tt.want, err)
 		})
 	}
 }
@@ -149,12 +162,12 @@ func (s *ValidateTestSuite) TestValidateP2WPKH() {
 		},
 		{
 			name: "Invalid address for public key hash",
-			args: args{recoveryFlag: 32, witnessProg: pubKeyHash, addr: &RandomAddress{Address: "Invalid"}},
+			args: args{recoveryFlag: 32, witnessProg: s.legacyPubKeyHash, addr: &RandomAddress{Address: "Invalid"}},
 			want: errors.New("generated address 'bc1qs4c46q43meu623fz8km84ma93rjhef7z88rg99' does not match expected address 'Invalid'"),
 		},
 		{
 			name: "Valid P2WPKH",
-			args: args{recoveryFlag: 32, witnessProg: pubKeyHash, addr: &RandomAddress{Address: "bc1qs4c46q43meu623fz8km84ma93rjhef7z88rg99"}},
+			args: args{recoveryFlag: 32, witnessProg: s.legacyPubKeyHash, addr: &RandomAddress{Address: "bc1qs4c46q43meu623fz8km84ma93rjhef7z88rg99"}},
 			want: nil,
 		},
 	}
@@ -162,19 +175,13 @@ func (s *ValidateTestSuite) TestValidateP2WPKH() {
 	for _, tt := range tests {
 		s.T().Run(tt.name, func(t *testing.T) {
 			_, err := internal.ValidateP2WPKH(tt.args.recoveryFlag, tt.args.witnessProg, tt.args.addr, &chaincfg.MainNetParams)
-			require.Equal(t, err, tt.want)
+			require.Equal(t, tt.want, err)
 		})
 	}
 }
 
+// All addresses were generated via https://demo.unisat.io/
 func (s *ValidateTestSuite) TestValidateP2TR() {
-	// Generated via https://unisat.io/ which uses https://github.com/bitpay/bitcore
-	x, y := &btcec.FieldVal{}, &btcec.FieldVal{}
-	x.SetBytes(&[32]byte{199, 142, 160, 82, 151, 162, 66, 186, 11, 43, 16, 91, 237, 71, 91, 135, 150, 252, 234, 48, 99, 136, 19, 243, 89, 137, 196, 224, 241, 223, 158, 246})
-	y.SetBytes(&[32]byte{72, 92, 183, 101, 120, 192, 238, 204, 246, 77, 101, 137, 220, 171, 222, 21, 13, 79, 125, 140, 76, 22, 138, 145, 121, 157, 206, 101, 219, 101, 217, 105})
-
-	pubKey := btcec.NewPublicKey(x, y)
-
 	type args struct {
 		recoveryFlag int
 		pubKey       *btcec.PublicKey
@@ -185,11 +192,6 @@ func (s *ValidateTestSuite) TestValidateP2TR() {
 		args args
 		want error
 	}{
-		{
-			name: "Invalid recovery flag - compressed",
-			args: args{recoveryFlag: 33, pubKey: &btcec.PublicKey{}, addr: &RandomAddress{}},
-			want: errors.New("cannot use P2TR for recovery flag 'compressed'"),
-		},
 		{
 			name: "Invalid recovery flag - TrezorP2WPKH",
 			args: args{recoveryFlag: 36, pubKey: &btcec.PublicKey{}, addr: &RandomAddress{}},
@@ -206,13 +208,23 @@ func (s *ValidateTestSuite) TestValidateP2TR() {
 			want: secp256k1.Error{Err: secp256k1.ErrPubKeyNotOnCurve, Description: "invalid public key: x coordinate 0000000000000000000000000000000000000000000000000000000000000000 is not on the secp256k1 curve"},
 		},
 		{
+			name: "Invalid address for public key - compressed",
+			args: args{recoveryFlag: 31, pubKey: s.compressedPublicKey, addr: &RandomAddress{Address: "Invalid"}},
+			want: errors.New("generated address 'bc1pgc9k3vdmr9aecmwj09qg5qv550qyyrydufyfmxrsvk5474rxenuqrq4lcz' does not match expected address 'Invalid'"),
+		},
+		{
 			name: "Invalid address for public key",
-			args: args{recoveryFlag: 27, pubKey: pubKey, addr: &RandomAddress{Address: "Invalid"}},
+			args: args{recoveryFlag: 27, pubKey: s.uncompressedPublicKey, addr: &RandomAddress{Address: "Invalid"}},
 			want: errors.New("generated address 'bc1pg48rw0vphy9mght5dr8s5prx92a44wpqmzk67xk8yjf5zlancj9sa3plhc' does not match expected address 'Invalid'"),
 		},
 		{
+			name: "Valid P2TR - compressed",
+			args: args{recoveryFlag: 31, pubKey: s.compressedPublicKey, addr: &RandomAddress{Address: "bc1pgc9k3vdmr9aecmwj09qg5qv550qyyrydufyfmxrsvk5474rxenuqrq4lcz"}},
+			want: nil,
+		},
+		{
 			name: "Valid P2TR",
-			args: args{recoveryFlag: 27, pubKey: pubKey, addr: &RandomAddress{Address: "bc1pg48rw0vphy9mght5dr8s5prx92a44wpqmzk67xk8yjf5zlancj9sa3plhc"}},
+			args: args{recoveryFlag: 27, pubKey: s.uncompressedPublicKey, addr: &RandomAddress{Address: "bc1pg48rw0vphy9mght5dr8s5prx92a44wpqmzk67xk8yjf5zlancj9sa3plhc"}},
 			want: nil,
 		},
 	}
@@ -220,9 +232,26 @@ func (s *ValidateTestSuite) TestValidateP2TR() {
 	for _, tt := range tests {
 		s.T().Run(tt.name, func(t *testing.T) {
 			_, err := internal.ValidateP2TR(tt.args.recoveryFlag, tt.args.pubKey, tt.args.addr, &chaincfg.MainNetParams)
-			require.Equal(t, err, tt.want)
+			require.Equal(t, tt.want, err)
 		})
 	}
+}
+
+func (s *ValidateTestSuite) createTaprootPublicKey(publicKey string) *btcec.PublicKey {
+	// Convert hexadecimal to bytes
+	compressedPublicKeyBytes, err := hex.DecodeString(publicKey[2:])
+	if err != nil {
+		s.Require().NoError(err)
+	}
+
+	// Setup X,Y storage
+	x, y := &btcec.FieldVal{}, &btcec.FieldVal{}
+
+	// Since taproot uses x-only public keys, only set X
+	x.SetBytes((*[32]byte)(compressedPublicKeyBytes[:32]))
+
+	// Create a btcd public key
+	return btcec.NewPublicKey(x, y)
 }
 
 // RandomAddress implements the btcutil.Address interface and serves as a no-op to test these calls.

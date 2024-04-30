@@ -72,11 +72,11 @@ func ValidateP2WPKH(recoveryFlag int, pubkeyHash []byte, addr btcutil.Address, n
 }
 
 // ValidateP2TR ensures that the passed P2TR address matches the address generated from the public key hash, recovery flag and network.
+//
+// Only addresses without a tapscript are allowed because the verification is using the internal key.
 func ValidateP2TR(recoveryFlag int, pubKey *btcec.PublicKey, addr btcutil.Address, net *chaincfg.Params) (bool, error) {
 	// Ensure proper address type will be generated
-	if lo.Contains[int](flags.Compressed(), recoveryFlag) {
-		return false, errors.New("cannot use P2TR for recovery flag 'compressed'")
-	} else if lo.Contains[int](flags.TrezorP2WPKHAndP2SH(), recoveryFlag) {
+	if lo.Contains[int](flags.TrezorP2WPKHAndP2SH(), recoveryFlag) {
 		return false, errors.New("cannot use P2TR for recovery flag 'BIP137 (Trezor) P2WPKH-P2SH'")
 	} else if lo.Contains[int](flags.TrezorP2WPKH(), recoveryFlag) {
 		return false, errors.New("cannot use P2TR for recovery flag 'BIP137 (Trezor) P2WPKH'")

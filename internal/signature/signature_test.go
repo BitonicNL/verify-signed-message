@@ -9,7 +9,6 @@ import (
 	"github.com/btcsuite/btcd/btcec/v2"
 	"github.com/btcsuite/btcd/btcec/v2/ecdsa"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitonicnl/verify-signed-message/internal"
@@ -47,42 +46,42 @@ func TestServiceTestSuite(t *testing.T) {
 
 func (s *SignatureTestSuite) TestParseCompactInvalid() {
 	compactedSignature, err := signature.ParseCompact([]byte{})
-	require.EqualError(s.T(), err, "invalid compact signature size")
-	require.Nil(s.T(), compactedSignature)
+	s.Require().EqualError(err, "invalid compact signature size")
+	s.Nil(compactedSignature)
 }
 
 func (s *SignatureTestSuite) TestParseCompact() {
 	compactedSignature, err := signature.ParseCompact(s.signatureEncoded)
-	require.NoError(s.T(), err)
+	s.Require().NoError(err)
 
 	// Retrieve the unexported fields
 	R := s.getFieldFromSignature(compactedSignature, "r")
 	S := s.getFieldFromSignature(compactedSignature, "s")
 
 	// Ensure they match what we defined
-	require.Equal(s.T(), "112454100686917088716763005039207074580155840372180209748670933598947425987108", R.String())
-	require.Equal(s.T(), "23603267825273168310009216611640910854054822424267934178492474518750065713966", S.String())
+	s.Equal("112454100686917088716763005039207074580155840372180209748670933598947425987108", R.String())
+	s.Equal("23603267825273168310009216611640910854054822424267934178492474518750065713966", S.String())
 }
 
 func (s *SignatureTestSuite) TestVerifyInvalidPublicKey() {
 	err := signature.Verify(s.signatureEncoded, &btcec.PublicKey{}, []byte{})
-	require.EqualError(s.T(), err, "public key was not correctly instantiated")
+	s.Require().EqualError(err, "public key was not correctly instantiated")
 }
 
 func (s *SignatureTestSuite) TestVerifyInvalidEncodedSignature() {
 	key, err := btcec.NewPrivateKey()
-	require.NoError(s.T(), err)
+	s.Require().NoError(err)
 
 	err = signature.Verify([]byte{}, key.PubKey(), []byte{})
-	require.EqualError(s.T(), err, "invalid compact signature size")
+	s.Require().EqualError(err, "invalid compact signature size")
 }
 
 func (s *SignatureTestSuite) TestVerifyInvalidSignature() {
 	key, err := btcec.NewPrivateKey()
-	require.NoError(s.T(), err)
+	s.Require().NoError(err)
 
 	err = signature.Verify(s.signatureEncoded, key.PubKey(), []byte{})
-	require.EqualError(s.T(), err, "signature could not be verified")
+	s.Require().EqualError(err, "signature could not be verified")
 }
 
 func (s *SignatureTestSuite) TestVerifyInvalidMessage() {
@@ -90,9 +89,9 @@ func (s *SignatureTestSuite) TestVerifyInvalidMessage() {
 	messageHash := chainhash.DoubleHashB([]byte(magicMessage))
 
 	publicKey, err := btcec.ParsePubKey(s.publicKeyEncoded)
-	require.NoError(s.T(), err)
+	s.Require().NoError(err)
 
-	require.EqualError(s.T(), signature.Verify(s.signatureEncoded, publicKey, messageHash), "signature could not be verified")
+	s.Require().EqualError(signature.Verify(s.signatureEncoded, publicKey, messageHash), "signature could not be verified")
 }
 
 func (s *SignatureTestSuite) TestVerify() {
@@ -100,9 +99,9 @@ func (s *SignatureTestSuite) TestVerify() {
 	messageHash := chainhash.DoubleHashB([]byte(magicMessage))
 
 	publicKey, err := btcec.ParsePubKey(s.publicKeyEncoded)
-	require.NoError(s.T(), err)
+	s.Require().NoError(err)
 
-	require.NoError(s.T(), signature.Verify(s.signatureEncoded, publicKey, messageHash))
+	s.Require().NoError(signature.Verify(s.signatureEncoded, publicKey, messageHash))
 }
 
 func (s *SignatureTestSuite) getFieldFromSignature(compactedSignature *ecdsa.Signature, field string) *big.Int {
@@ -115,7 +114,7 @@ func (s *SignatureTestSuite) getFieldFromSignature(compactedSignature *ecdsa.Sig
 	// Grab the unexported field
 	rReflected := elem.FieldByName(field)
 	m, ok := reflect.NewAt(rReflected.Type(), unsafe.Pointer(rReflected.UnsafeAddr())).Elem().Interface().(btcec.ModNScalar)
-	require.True(s.T(), ok)
+	s.True(ok)
 
 	// Grab ModNScalar bytes
 	bytes := m.Bytes()

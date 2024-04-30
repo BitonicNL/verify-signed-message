@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
 	verifier "github.com/bitonicnl/verify-signed-message/pkg"
@@ -125,8 +124,8 @@ func (s *VerifyTestSuite) TestVerifyIncorrect() {
 	for name, tt := range tests {
 		s.Run(name, func() {
 			valid, err := verifier.Verify(tt.signedMessage)
-			assert.EqualError(s.T(), err, tt.expectedError)
-			assert.False(s.T(), valid)
+			s.False(valid)
+			s.Require().EqualError(err, tt.expectedError)
 		})
 	}
 }
@@ -149,9 +148,9 @@ func (s *VerifyTestSuite) TestVerifyWithChainTestnet() {
 
 	for name, tt := range tests {
 		s.Run(name, func() {
-			if valid, err := verifier.VerifyWithChain(tt, &chaincfg.TestNet3Params); assert.NoError(s.T(), err) {
-				assert.True(s.T(), valid)
-			}
+			valid, err := verifier.VerifyWithChain(tt, &chaincfg.TestNet3Params)
+			s.Require().NoError(err)
+			s.True(valid)
 		})
 	}
 }
@@ -330,9 +329,9 @@ func (s *VerifyTestSuite) TestVerify() {
 
 	for i := range tests {
 		s.Run(i, func() {
-			if valid, err := verifier.Verify(tests[i]); assert.NoError(s.T(), err) {
-				assert.True(s.T(), valid)
-			}
+			valid, err := verifier.Verify(tests[i])
+			s.Require().NoError(err)
+			s.True(valid)
 		})
 	}
 }
