@@ -1,7 +1,7 @@
 # Bitcoin Signed Message Verifier
 
 [![Latest tag](https://img.shields.io/github/tag/bitonicnl/verify-signed-message.svg)](https://github.com/bitonicnl/verify-signed-message/tags)
-![Go Version](https://img.shields.io/badge/Go-%3E%3D%201.18-%23007d9c)
+![Go Version](https://img.shields.io/badge/Go-%3E%3D%201.21-%23007d9c)
 [![GoDoc](https://godoc.org/github.com/bitonicnl/verify-signed-message?status.svg)](https://pkg.go.dev/github.com/bitonicnl/verify-signed-message)
 [![Tests status](https://github.com/bitonicnl/verify-signed-message/actions/workflows/test.yml/badge.svg)](https://github.com/BitonicNL/verify-signed-message/actions/workflows/test.yml)
 [![Go report](https://goreportcard.com/badge/github.com/bitonicnl/verify-signed-message)](https://goreportcard.com/report/github.com/bitonicnl/verify-signed-message)
@@ -11,7 +11,7 @@
 
 ## Requirements
 
-- Golang 1.18+
+- Golang 1.21+
 
 ## Installation
 
