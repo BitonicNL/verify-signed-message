@@ -60,7 +60,6 @@ linters:
     - gocritic
     - gocyclo
     - godot
-    - godox
     - gofmt
     - gofumpt
     - goheader

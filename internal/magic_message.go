@@ -2,6 +2,7 @@ package internal
 
 import (
 	"bytes"
+	"crypto/sha256"
 
 	"github.com/btcsuite/btcd/wire"
 )
@@ -14,6 +15,10 @@ const varIntProtoVer uint32 = 0
 // Taken from https://bitcoin.stackexchange.com/a/77325
 const magicMessage = "\x18Bitcoin Signed Message:\n"
 
+// Signed message via BIP-322 are prepended with this bip322Tag
+// Taken from https://github.com/bitcoin/bips/blob/master/bip-0322.mediawiki#full
+const bip322Tag = "BIP0322-signed-message"
+
 // CreateMagicMessage builds a properly signed message.
 func CreateMagicMessage(message string) string {
 	buffer := bytes.Buffer{}
@@ -25,4 +30,13 @@ func CreateMagicMessage(message string) string {
 	}
 
 	return magicMessage + buffer.String() + message
+}
+
+// CreateMagicMessageBIP322 builds a properly signed message (in BIP-322 format).
+func CreateMagicMessageBIP322(message []byte) [32]byte {
+	tagHash := sha256.Sum256([]byte(bip322Tag))
+	sum := append(tagHash[:], tagHash[:]...) // Append tagHash twice
+	sum = append(sum, message...)
+
+	return sha256.Sum256(sum)
 }
