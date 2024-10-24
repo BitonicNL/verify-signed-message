@@ -11,7 +11,6 @@ import (
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/decred/dcrd/dcrec/secp256k1/v4"
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitonicnl/verify-signed-message/internal/generic"
@@ -82,9 +81,9 @@ func (s *ValidateTestSuite) TestValidateP2PKH() {
 	}
 
 	for _, tt := range tests {
-		s.T().Run(tt.name, func(t *testing.T) {
+		s.Run(tt.name, func() {
 			_, err := generic.ValidateP2PKH(tt.args.recoveryFlag, tt.args.pubKeyHash, tt.args.addr, &chaincfg.MainNetParams)
-			require.Equal(t, tt.want, err)
+			s.Require().Equal(tt.want, err)
 		})
 	}
 }
@@ -132,9 +131,9 @@ func (s *ValidateTestSuite) TestValidateP2SH() {
 	}
 
 	for _, tt := range tests {
-		s.T().Run(tt.name, func(t *testing.T) {
+		s.Run(tt.name, func() {
 			_, err := generic.ValidateP2SH(tt.args.recoveryFlag, tt.args.pubKeyHash, tt.args.addr, &chaincfg.MainNetParams)
-			require.Equal(t, tt.want, err)
+			s.Require().Equal(tt.want, err)
 		})
 	}
 }
@@ -173,9 +172,9 @@ func (s *ValidateTestSuite) TestValidateP2WPKH() {
 	}
 
 	for _, tt := range tests {
-		s.T().Run(tt.name, func(t *testing.T) {
+		s.Run(tt.name, func() {
 			_, err := generic.ValidateP2WPKH(tt.args.recoveryFlag, tt.args.witnessProg, tt.args.addr, &chaincfg.MainNetParams)
-			require.Equal(t, tt.want, err)
+			s.Require().Equal(tt.want, err)
 		})
 	}
 }
@@ -230,9 +229,9 @@ func (s *ValidateTestSuite) TestValidateP2TR() {
 	}
 
 	for _, tt := range tests {
-		s.T().Run(tt.name, func(t *testing.T) {
+		s.Run(tt.name, func() {
 			_, err := generic.ValidateP2TR(tt.args.recoveryFlag, tt.args.pubKey, tt.args.addr, &chaincfg.MainNetParams)
-			require.Equal(t, tt.want, err)
+			s.Require().Equal(tt.want, err)
 		})
 	}
 }
