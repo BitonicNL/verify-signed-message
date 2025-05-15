@@ -11,7 +11,7 @@
 
 ## Requirements
 
-- Golang 1.21+
+- Golang 1.23+
 
 ## Installation
 
@@ -84,4 +84,4 @@ Contributions, issues and feature requests are welcome.
 
 ## License
 
-Copyright © 2020-2024 Bitonic. This project is [ISC](/LICENSE) licensed.
+Copyright © 2020-2025 Bitonic. This project is [ISC](/LICENSE) licensed.

@@ -1,30 +1,11 @@
-# Options for analysis running
-linters-settings:
-  dupl:
-    threshold: 100
-  gci:
-    sections:
-      - standard
-      - default
-      - prefix(github.com/bitonicnl/verify-signed-message)
-      - blank
-      - dot
-    skip-generated: false
-    custom-order: true
-  goconst:
-    min-len: 2
-    min-occurrences: 2
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - experimental
-      - opinionated
-      - performance
-      - style
-  goimports:
-    local-prefixes: github.com/bitonicnl/verify-signed-message
-  misspell:
-    locale: US
+version: "2"
+
+output:
+  formats:
+    text:
+      path: stdout
+      print-linter-name: true
+      print-issued-lines: true
 
 linters:
   enable:
@@ -39,7 +20,6 @@ linters:
     - dupl
     - dupword
     - durationcheck
-    - errcheck
     - errchkjson
     - errname
     - errorlint
@@ -47,7 +27,6 @@ linters:
     - exhaustruct
     - forbidigo
     - forcetypeassert
-    - gci
     - ginkgolinter
     - gocheckcompilerdirectives
     - gochecknoglobals
@@ -58,21 +37,15 @@ linters:
     - gocritic
     - gocyclo
     - godot
-    - gofmt
-    - gofumpt
     - goheader
-    - goimports
     - gomoddirectives
     - gomodguard
     - goprintffuncname
     - gosec
-    - gosimple
     - gosmopolitan
-    - govet
     - grouper
     - importas
     - inamedparam
-    - ineffassign
     - interfacebloat
     - ireturn
     - loggercheck
@@ -103,44 +76,80 @@ linters:
     - spancheck
     - sqlclosecheck
     - staticcheck
-    - stylecheck
     - tagalign
     - tagliatelle
-    - tenv
     - testableexamples
     - testifylint
     - testpackage
     - thelper
     - tparallel
-    - typecheck
     - unconvert
     - unparam
-    - unused
     - usestdlibvars
     - wastedassign
     - whitespace
     - zerologlint
+  settings:
+    dupl:
+      threshold: 100
+    goconst:
+      min-len: 2
+      min-occurrences: 2
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - experimental
+        - opinionated
+        - performance
+        - style
+    misspell:
+      locale: US
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - dupword
+          - exhaustruct
+        path: _test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 
 issues:
-  # Show only new issues: if there are unstaged changes or untracked files,
-  # only those changes are analyzed, else only changes in HEAD~ are analyzed.
   new: false
 
-  # Excluding configuration per-path, per-linter, per-text and per-source
-  exclude-rules:
-    # Exclude some linters from running on tests files
-    - path: _test\.go
-      linters:
-        - dupword
-        - exhaustruct
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/bitonicnl/verify-signed-message)
+        - blank
+        - dot
+      custom-order: true
+    goimports:
+      local-prefixes:
+        - github.com/bitonicnl/verify-signed-message
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 
-# output configuration options
-output:
-  # colored-line-number|line-number|json|tab|checkstyle|code-climate, default is "colored-line-number"
-  formats: [ { format: colored-line-number } ]
-
-  # print lines of code with issue, default is true
-  print-issued-lines: true
-
-  # print linter name in the end of issue text, default is true
-  print-linter-name: true
+run:
+  modules-download-mode: readonly
+  allow-parallel-runners: true
+  allow-serial-runners: true
