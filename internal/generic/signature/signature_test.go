@@ -47,7 +47,7 @@ func TestServiceTestSuite(t *testing.T) {
 func (s *SignatureTestSuite) TestParseCompactInvalid() {
 	compactedSignature, err := signature.ParseCompact([]byte{})
 	s.Require().EqualError(err, "invalid compact signature size")
-	s.Nil(compactedSignature)
+	s.Require().Nil(compactedSignature)
 }
 
 func (s *SignatureTestSuite) TestParseCompactInvalidRecoveryCode() {
@@ -63,7 +63,7 @@ func (s *SignatureTestSuite) TestParseCompactInvalidRecoveryCode() {
 		0xc9,
 	})
 	s.Require().EqualError(err, "invalid compact signature recovery code")
-	s.Nil(compactedSignature)
+	s.Require().Nil(compactedSignature)
 }
 
 func (s *SignatureTestSuite) TestParseCompact() {
@@ -75,8 +75,8 @@ func (s *SignatureTestSuite) TestParseCompact() {
 	S := s.getFieldFromSignature(compactedSignature, "s")
 
 	// Ensure they match what we defined
-	s.Equal("112454100686917088716763005039207074580155840372180209748670933598947425987108", R.String())
-	s.Equal("23603267825273168310009216611640910854054822424267934178492474518750065713966", S.String())
+	s.Require().Equal("112454100686917088716763005039207074580155840372180209748670933598947425987108", R.String())
+	s.Require().Equal("23603267825273168310009216611640910854054822424267934178492474518750065713966", S.String())
 }
 
 func (s *SignatureTestSuite) TestVerifyInvalidPublicKey() {
@@ -130,7 +130,7 @@ func (s *SignatureTestSuite) getFieldFromSignature(compactedSignature *ecdsa.Sig
 	// Grab the unexported field
 	rReflected := elem.FieldByName(field)
 	m, ok := reflect.NewAt(rReflected.Type(), unsafe.Pointer(rReflected.UnsafeAddr())).Elem().Interface().(btcec.ModNScalar)
-	s.True(ok)
+	s.Require().True(ok)
 
 	// Grab ModNScalar bytes
 	bytes := m.Bytes()

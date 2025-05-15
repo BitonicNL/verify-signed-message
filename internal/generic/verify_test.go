@@ -115,7 +115,7 @@ func (s *VerifyTestSuite) TestVerifyIncorrect() {
 
 			valid, err := generic.Verify(address, tt.signedMessage.Message, signatureDecoded, &chaincfg.MainNetParams)
 			s.Require().EqualError(err, tt.expectedError)
-			s.False(valid)
+			s.Require().False(valid)
 		})
 	}
 }
@@ -305,7 +305,7 @@ func (s *VerifyTestSuite) TestVerify() {
 
 			valid, err := generic.Verify(address, tt.Message, signatureDecoded, &chaincfg.MainNetParams)
 			s.Require().NoError(err)
-			s.True(valid)
+			s.Require().True(valid)
 		})
 	}
 }

@@ -20,19 +20,19 @@ func TestRecoveryFlagTestSuite(t *testing.T) {
 }
 
 func (s *RecoveryFlagTestSuite) TestAll() {
-	s.Equal([]int{27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42}, flags.All())
+	s.Require().Equal([]int{27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42}, flags.All())
 }
 
 func (s *RecoveryFlagTestSuite) TestCompressed() {
-	s.Equal([]int{31, 32, 33, 34}, flags.Compressed())
+	s.Require().Equal([]int{31, 32, 33, 34}, flags.Compressed())
 }
 
 func (s *RecoveryFlagTestSuite) TestElectrumP2WPKH() {
-	s.Equal([]int{31, 32, 33, 34}, flags.ElectrumP2WPKH())
+	s.Require().Equal([]int{31, 32, 33, 34}, flags.ElectrumP2WPKH())
 }
 
 func (s *RecoveryFlagTestSuite) TestElectrumP2SHAndP2WPKH() {
-	s.Equal([]int{31, 32, 33, 34}, flags.ElectrumP2SHAndP2WPKH())
+	s.Require().Equal([]int{31, 32, 33, 34}, flags.ElectrumP2SHAndP2WPKH())
 }
 
 func (s *RecoveryFlagTestSuite) TestGetKeyID() {
@@ -50,10 +50,8 @@ func (s *RecoveryFlagTestSuite) TestGetKeyID() {
 	}
 
 	for _, tt := range tests {
-		s.T().Run(tt.name, func(t *testing.T) {
-			if got := flags.GetKeyID(tt.recoveryFlag); got != tt.expectedKeyID {
-				t.Errorf("GetKeyID() = %v, want %v", got, tt.expectedKeyID)
-			}
+		s.Run(tt.name, func() {
+			s.Require().Equal(tt.expectedKeyID, flags.GetKeyID(tt.recoveryFlag))
 		})
 	}
 }
@@ -70,26 +68,24 @@ func (s *RecoveryFlagTestSuite) TestShouldBeCompressed() {
 	}
 
 	for _, tt := range tests {
-		s.T().Run(tt.name, func(t *testing.T) {
-			if got := flags.ShouldBeCompressed(tt.recoveryFlag); got != tt.expected {
-				t.Errorf("ShouldBeCompressed() = %v, want %v", got, tt.expected)
-			}
+		s.Run(tt.name, func() {
+			s.Require().Equal(tt.expected, flags.ShouldBeCompressed(tt.recoveryFlag))
 		})
 	}
 }
 
 func (s *RecoveryFlagTestSuite) TestTrezor() {
-	s.Equal([]int{35, 36, 37, 38, 39, 40, 41, 42}, flags.Trezor())
+	s.Require().Equal([]int{35, 36, 37, 38, 39, 40, 41, 42}, flags.Trezor())
 }
 
 func (s *RecoveryFlagTestSuite) TestTrezorP2WPKH() {
-	s.Equal([]int{39, 40, 41, 42}, flags.TrezorP2WPKH())
+	s.Require().Equal([]int{39, 40, 41, 42}, flags.TrezorP2WPKH())
 }
 
 func (s *RecoveryFlagTestSuite) TestTrezorP2SHAndP2WPKH() {
-	s.Equal([]int{35, 36, 37, 38}, flags.TrezorP2SHAndP2WPKH())
+	s.Require().Equal([]int{35, 36, 37, 38}, flags.TrezorP2SHAndP2WPKH())
 }
 
 func (s *RecoveryFlagTestSuite) TestUncompressed() {
-	s.Equal([]int{27, 28, 29, 30}, flags.Uncompressed())
+	s.Require().Equal([]int{27, 28, 29, 30}, flags.Uncompressed())
 }

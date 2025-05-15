@@ -21,13 +21,6 @@ jobs:
         with:
           go-version: 1.23
 
-      - name: Caching
-        uses: actions/cache@v4
-        with:
-          path: ~/go/pkg/mod
-          key: go-${{ hashFiles('**/go.sum') }}
-          restore-keys: go-
-
       - name: Dependencies
         run: go mod vendor
 
@@ -36,6 +29,8 @@ jobs:
 
       - name: Codestyle
         uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.1.6
 
       - name: Golang Vulncheck
         uses: Templum/govulncheck-action@v1.0.2

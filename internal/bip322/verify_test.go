@@ -113,7 +113,7 @@ func (s *VerifyTestSuite) TestVerifyIncorrect() {
 
 			valid, err := bip322.Verify(address, tt.signedMessage.Message, signatureDecoded)
 			s.Require().EqualError(err, tt.expectedError)
-			s.False(valid)
+			s.Require().False(valid)
 		})
 	}
 }
@@ -183,7 +183,7 @@ func (s *VerifyTestSuite) TestVerify() {
 
 			valid, err := bip322.Verify(address, tt.Message, signatureDecoded)
 			s.Require().NoError(err)
-			s.True(valid)
+			s.Require().True(valid)
 		})
 	}
 }
