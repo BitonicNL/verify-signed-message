@@ -14,12 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version: 1.23
+          go-version: 1.24
 
       - name: Dependencies
         run: go mod vendor
@@ -28,14 +28,14 @@ jobs:
         run: go mod verify
 
       - name: Codestyle
-        uses: golangci/golangci-lint-action@v8
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.1.6
+          version: v2.10.1
 
       - name: Golang Vulncheck
         uses: Templum/govulncheck-action@v1.0.2
         with:
-          go-version: 1.23
+          go-version: 1.24
           vulncheck-version: latest
           fail-on-vuln: true
           skip-upload: true
