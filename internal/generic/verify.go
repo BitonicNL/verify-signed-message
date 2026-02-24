@@ -36,7 +36,11 @@ func Verify(address btcutil.Address, message string, signatureDecoded []byte, ne
 
 	// Reset recovery flag after obtaining keyID for Trezor
 	if lo.Contains[int](flags.Trezor(), recoveryFlag) {
-		signatureDecoded[0] = byte(27 + flags.GetKeyID(recoveryFlag))
+		keyID := 27 + flags.GetKeyID(recoveryFlag)
+		if keyID < 0 || keyID > 255 {
+			return false, fmt.Errorf("invalid key ID value: %d", keyID)
+		}
+		signatureDecoded[0] = byte(keyID)
 	}
 
 	// Make and hash the message

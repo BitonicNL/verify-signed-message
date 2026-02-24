@@ -44,7 +44,6 @@ linters:
     - gosec
     - gosmopolitan
     - grouper
-    - importas
     - inamedparam
     - interfacebloat
     - ireturn
@@ -116,10 +115,6 @@ linters:
           - dupword
           - exhaustruct
         path: _test\.go
-    paths:
-      - third_party$
-      - builtin$
-      - examples$
 
 issues:
   new: false
@@ -142,12 +137,6 @@ formatters:
     goimports:
       local-prefixes:
         - github.com/bitonicnl/verify-signed-message
-  exclusions:
-    generated: lax
-    paths:
-      - third_party$
-      - builtin$
-      - examples$
 
 run:
   modules-download-mode: readonly
