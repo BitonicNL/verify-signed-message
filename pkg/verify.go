@@ -41,7 +41,12 @@ func VerifyWithChain(signedMessage SignedMessage, net *chaincfg.Params) (bool, e
 	}
 
 	// Decode the signature
-	signatureDecoded, err := base64.StdEncoding.DecodeString(signedMessage.Signature)
+	signature := strings.TrimSpace(signedMessage.Signature)
+
+	signatureDecoded, err := base64.StdEncoding.DecodeString(signature)
+	if err != nil && strings.HasPrefix(signature, "smp") {
+		signatureDecoded, err = base64.StdEncoding.DecodeString(signature[3:])
+	}
 	if err != nil {
 		return false, fmt.Errorf("could not decode signature: %w", err)
 	}
