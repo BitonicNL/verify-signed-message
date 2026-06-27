@@ -40,8 +40,17 @@ func VerifyWithChain(signedMessage SignedMessage, net *chaincfg.Params) (bool, e
 		return false, fmt.Errorf("address '%s' is not valid for network '%s'", signedMessage.Address, net.Name)
 	}
 
+	// Grab the signature from the message
+	signature := signedMessage.Signature
+
 	// Decode the signature
-	signatureDecoded, err := base64.StdEncoding.DecodeString(signedMessage.Signature)
+	signatureDecoded, err := base64.StdEncoding.DecodeString(signature)
+
+	// Edge-case for SMP signed messages
+	if err != nil && strings.HasPrefix(signature, "smp") {
+		signatureDecoded, err = base64.StdEncoding.DecodeString(signedMessage.Signature[3:])
+	}
+
 	if err != nil {
 		return false, fmt.Errorf("could not decode signature: %w", err)
 	}
