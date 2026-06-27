@@ -121,6 +121,11 @@ func (s *VerifyTestSuite) TestVerify() {
 			Message:   "Hello World",
 			Signature: "AkcwRAIgZRfIY3p7/DoVTty6YZbWS71bc5Vct9p9Fia83eRmw2QCICK/ENGfwLtptFluMGs2KsqoNSk89pO7F29zJLUx9a/sASECx/EgAxlkQpQ9hYjgGu6EBCPMVPwVIVJqO4XCsMvViHI=",
 		},
+		"bip-322 - native segwit - test vector #0 - smp prefixed": {
+			Address:   "bc1q9vza2e8x573nczrlzms0wvx3gsqjx7vavgkx0l",
+			Message:   "Hello World",
+			Signature: "smpAkcwRAIgZRfIY3p7/DoVTty6YZbWS71bc5Vct9p9Fia83eRmw2QCICK/ENGfwLtptFluMGs2KsqoNSk89pO7F29zJLUx9a/sASECx/EgAxlkQpQ9hYjgGu6EBCPMVPwVIVJqO4XCsMvViHI=",
+		},
 	}
 
 	for i := range tests {
