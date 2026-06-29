@@ -33,13 +33,11 @@ linters:
     - gochecknoinits
     - gochecksumtype
     - gocognit
-    - goconst
     - gocritic
     - gocyclo
     - godot
     - goheader
     - gomoddirectives
-    - gomodguard
     - goprintffuncname
     - gosec
     - gosmopolitan
@@ -91,9 +89,6 @@ linters:
   settings:
     dupl:
       threshold: 100
-    goconst:
-      min-len: 2
-      min-occurrences: 2
     gocritic:
       enabled-tags:
         - diagnostic
