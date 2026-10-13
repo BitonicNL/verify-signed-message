@@ -3,12 +3,33 @@ package bip322_test
 import (
 	"encoding/base64"
 	"encoding/hex"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitonicnl/verify-signed-message/internal/bip322"
 )
+
+// This input decodes to a varint count of 4,000,000, which passes the item-count bound but would previously trigger an ~96 MB preallocation before failing on the truncated data. Assert the bounded allocation stays far below that.
+func TestSimpleSigToWitnessCountAmplification(t *testing.T) {
+	t.Parallel()
+
+	sig, err := base64.StdEncoding.DecodeString("/gAJPQA=")
+	require.NoError(t, err)
+	require.Len(t, sig, 5)
+
+	var before, after runtime.MemStats
+	runtime.GC()
+	runtime.ReadMemStats(&before)
+
+	_, err = bip322.SimpleSigToWitness(sig)
+	require.Error(t, err)
+
+	runtime.ReadMemStats(&after)
+	allocated := after.TotalAlloc - before.TotalAlloc
+	require.Less(t, allocated, uint64(8<<20))
+}
 
 func TestSimpleSigToWitness(t *testing.T) {
 	t.Parallel()
