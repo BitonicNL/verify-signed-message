@@ -1,11 +1,15 @@
 package bip322_test
 
 import (
+	"bytes"
 	"encoding/base64"
 	"testing"
 
+	"github.com/btcsuite/btcd/btcec/v2"
 	"github.com/btcsuite/btcd/btcutil"
 	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcd/txscript"
+	"github.com/btcsuite/btcd/wire"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitonicnl/verify-signed-message/internal/bip322"
@@ -118,6 +122,100 @@ func (s *VerifyTestSuite) TestVerifyIncorrect() {
 	}
 }
 
+func (s *VerifyTestSuite) TestVerifyP2WPKHSigHashConformance() {
+	tests := map[string]struct {
+		hashType    txscript.SigHashType
+		expectedErr string
+	}{
+		"SIGHASH_ALL": {
+			hashType: txscript.SigHashAll,
+		},
+		"SIGHASH_SINGLE": {
+			hashType:    txscript.SigHashSingle,
+			expectedErr: "invalid signature: BIP-322 requires SIGHASH_ALL for P2WPKH, got sighash type 0x03",
+		},
+	}
+
+	for name, tt := range tests {
+		s.Run(name, func() {
+			priv, err := btcec.NewPrivateKey()
+			s.Require().NoError(err)
+
+			pub := priv.PubKey().SerializeCompressed()
+			addr := s.p2wpkhAddress(priv)
+			toSpend, err := bip322.BuildToSpendTx([]byte("Hello World"), addr)
+			s.Require().NoError(err)
+
+			toSign := bip322.BuildToSignTx(toSpend)
+			fetcher := txscript.NewCannedPrevOutputFetcher(toSpend.TxOut[0].PkScript, 0)
+			sigHashes := txscript.NewTxSigHashes(toSign, fetcher)
+			witSig, err := txscript.RawTxInWitnessSignature(toSign, sigHashes, 0, 0, toSpend.TxOut[0].PkScript, tt.hashType, priv)
+			s.Require().NoError(err)
+
+			valid, err := bip322.Verify(addr, "Hello World", s.serializeSimpleSig(wire.TxWitness{witSig, pub}))
+			if tt.expectedErr != "" {
+				s.Require().EqualError(err, tt.expectedErr)
+				s.Require().False(valid)
+			} else {
+				s.Require().NoError(err)
+				s.Require().True(valid)
+			}
+		})
+	}
+}
+
+func (s *VerifyTestSuite) TestVerifyP2TRSigHashConformance() {
+	tests := map[string]struct {
+		hashType    txscript.SigHashType
+		expectedErr string
+	}{
+		"SIGHASH_ALL": {
+			hashType: txscript.SigHashAll,
+		},
+		"SIGHASH_DEFAULT": {
+			hashType: txscript.SigHashDefault,
+		},
+		"SIGHASH_NONE": {
+			hashType:    txscript.SigHashNone,
+			expectedErr: "invalid signature: BIP-322 requires SIGHASH_ALL or SIGHASH_DEFAULT for P2TR, got sighash type 0x02",
+		},
+		"SIGHASH_SINGLE": {
+			hashType:    txscript.SigHashSingle,
+			expectedErr: "invalid signature: BIP-322 requires SIGHASH_ALL or SIGHASH_DEFAULT for P2TR, got sighash type 0x03",
+		},
+		"SIGHASH_ALL_ANYONECANPAY": {
+			hashType:    txscript.SigHashAll | txscript.SigHashAnyOneCanPay,
+			expectedErr: "invalid signature: BIP-322 requires SIGHASH_ALL or SIGHASH_DEFAULT for P2TR, got sighash type 0x81",
+		},
+	}
+
+	for name, tt := range tests {
+		s.Run(name, func() {
+			priv, err := btcec.NewPrivateKey()
+			s.Require().NoError(err)
+
+			addr := s.p2trAddress(priv)
+			toSpend, err := bip322.BuildToSpendTx([]byte("Hello World"), addr)
+			s.Require().NoError(err)
+
+			toSign := bip322.BuildToSignTx(toSpend)
+			fetcher := txscript.NewCannedPrevOutputFetcher(toSpend.TxOut[0].PkScript, 0)
+			sigHashes := txscript.NewTxSigHashes(toSign, fetcher)
+			witness, err := txscript.TaprootWitnessSignature(toSign, sigHashes, 0, 0, toSpend.TxOut[0].PkScript, tt.hashType, priv)
+			s.Require().NoError(err)
+
+			valid, err := bip322.Verify(addr, "Hello World", s.serializeSimpleSig(witness))
+			if tt.expectedErr != "" {
+				s.Require().EqualError(err, tt.expectedErr)
+				s.Require().False(valid)
+			} else {
+				s.Require().NoError(err)
+				s.Require().True(valid)
+			}
+		})
+	}
+}
+
 func (s *VerifyTestSuite) TestVerify() {
 	tests := map[string]verifier.SignedMessage{
 		// BIP-322 test vector #0 - https://github.com/bitcoin/bips/blob/master/bip-0322.mediawiki#user-content-Test_vectors
@@ -186,4 +284,35 @@ func (s *VerifyTestSuite) TestVerify() {
 			s.Require().True(valid)
 		})
 	}
+}
+
+func (s *VerifyTestSuite) serializeSimpleSig(witness wire.TxWitness) []byte {
+	var buf bytes.Buffer
+	s.Require().NoError(wire.WriteVarInt(&buf, 0, uint64(len(witness))))
+	for _, item := range witness {
+		s.Require().NoError(wire.WriteVarInt(&buf, 0, uint64(len(item))))
+		buf.Write(item)
+	}
+
+	return buf.Bytes()
+}
+
+func (s *VerifyTestSuite) p2wpkhAddress(priv *btcec.PrivateKey) *btcutil.AddressWitnessPubKeyHash {
+	addr, err := btcutil.NewAddressWitnessPubKeyHash(
+		btcutil.Hash160(priv.PubKey().SerializeCompressed()),
+		&chaincfg.MainNetParams,
+	)
+	s.Require().NoError(err)
+
+	return addr
+}
+
+func (s *VerifyTestSuite) p2trAddress(priv *btcec.PrivateKey) *btcutil.AddressTaproot {
+	internalKey := txscript.ComputeTaprootKeyNoScript(priv.PubKey())
+	addr, err := btcutil.NewAddressTaproot(
+		internalKey.SerializeCompressed()[1:], &chaincfg.MainNetParams,
+	)
+	s.Require().NoError(err)
+
+	return addr
 }

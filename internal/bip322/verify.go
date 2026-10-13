@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/btcsuite/btcd/btcec/v2/schnorr"
 	"github.com/btcsuite/btcd/btcutil"
 	"github.com/btcsuite/btcd/txscript"
 )
@@ -26,6 +27,11 @@ func Verify(address btcutil.Address, message string, signatureDecoded []byte) (b
 	witness, err := SimpleSigToWitness(signatureDecoded)
 	if err != nil {
 		return false, fmt.Errorf("error converting signature into witness: %w", err)
+	}
+
+	// BIP-322 requires SIGHASH_ALL (or SIGHASH_DEFAULT for taproot), but the btcd engine accepts any sighash mode, so enforce the restriction ourselves.
+	if err := checkSigHash(address, witness); err != nil {
+		return false, err
 	}
 
 	toSign := BuildToSignTx(toSpend)
@@ -55,6 +61,40 @@ func Verify(address btcutil.Address, message string, signatureDecoded []byte) (b
 
 	// Verification successful
 	return true, nil
+}
+
+// checkSigHash enforces BIP-322's sighash restriction for the supported (P2WPKH and P2TR key-path) output types: SIGHASH_ALL is required, except taproot which also accepts SIGHASH_DEFAULT.
+func checkSigHash(address btcutil.Address, witness [][]byte) error {
+	if len(witness) == 0 {
+		return nil
+	}
+
+	// The signature is the first witness item for both supported output types.
+	rawSig := witness[0]
+	if len(rawSig) == 0 {
+		return nil
+	}
+
+	switch address.(type) {
+	// P2WPKH: ECDSA signature with an explicit trailing sighash byte.
+	case *btcutil.AddressWitnessPubKeyHash:
+		hashType := txscript.SigHashType(rawSig[len(rawSig)-1])
+		if hashType != txscript.SigHashAll {
+			return fmt.Errorf("invalid signature: BIP-322 requires SIGHASH_ALL for P2WPKH, got sighash type 0x%02x", hashType)
+		}
+
+	// P2TR: Schnorr signature, 64 bytes (implicit SIGHASH_DEFAULT) or 65 bytes with an explicit trailing sighash byte.
+	case *btcutil.AddressTaproot:
+		hashType := txscript.SigHashDefault
+		if len(rawSig) == schnorr.SignatureSize+1 {
+			hashType = txscript.SigHashType(rawSig[schnorr.SignatureSize])
+		}
+		if hashType != txscript.SigHashAll && hashType != txscript.SigHashDefault {
+			return fmt.Errorf("invalid signature: BIP-322 requires SIGHASH_ALL or SIGHASH_DEFAULT for P2TR, got sighash type 0x%02x", hashType)
+		}
+	}
+
+	return nil
 }
 
 func IsSupported(address btcutil.Address) bool {
