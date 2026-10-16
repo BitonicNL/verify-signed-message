@@ -78,6 +78,55 @@ func (s *VerifyTestSuite) TestVerifyIncorrect() {
 	}
 }
 
+func (s *VerifyTestSuite) TestVerifyWithChainUntrimmedUsesNetwork() {
+	// Regression test for a bug where the whitespace-trimming retry used Verify()
+	// (which hardcodes MainNet) instead of the caller's network, causing signed
+	// messages to silently switch networks when surrounded by whitespace.
+	tests := map[string]verifier.SignedMessage{
+		"mainnet message with testnet network - trimmed": {
+			Address:   "1DAag8qiPLHh6hMFVu9qJQm9ro1HtwuyK5",
+			Message:   "test message",
+			Signature: "IFqUo4/sxBEFkfK8mZeeN56V13BqOc0D90oPBChF3gTqMXtNSCTN79UxC33kZ8Mi0cHy4zYCnQfCxTyLpMVXKeA=",
+		},
+	}
+
+	for name, tt := range tests {
+		s.Run(name, func() {
+			valid, err := verifier.VerifyWithChain(tt, &chaincfg.TestNet3Params)
+			s.False(valid)
+			s.Require().Error(err)
+
+			// With whitespace added, the trimming retry must still respect the
+			// passed network and must not fall through to MainNet.
+			tt.Message = "  " + tt.Message + "  "
+			valid, err = verifier.VerifyWithChain(tt, &chaincfg.TestNet3Params)
+			s.False(valid)
+			s.Require().Error(err)
+		})
+	}
+}
+
+func (s *VerifyTestSuite) TestVerifyWithChainUntrimmedValid() {
+	// Sanity check that trimming still works when the message is valid for the
+	// selected network.
+	tests := map[string]verifier.SignedMessage{
+		"testnet message with testnet network - untrimmed": {
+			Address:   "tb1qr97cuq4kvq7plfetmxnl6kls46xaka78n2288z",
+			Message:   "The outage comes at a time when bitcoin has been fast approaching new highs not seen since June 26, 2019.",
+			Signature: "H/bSByRH7BW1YydfZlEx9x/nt4EAx/4A691CFlK1URbPEU5tJnTIu4emuzkgZFwC0ptvKuCnyBThnyLDCqPqT10=",
+		},
+	}
+
+	for name, tt := range tests {
+		s.Run(name, func() {
+			tt.Message = "  " + tt.Message + "  "
+			valid, err := verifier.VerifyWithChain(tt, &chaincfg.TestNet3Params)
+			s.Require().NoError(err)
+			s.True(valid)
+		})
+	}
+}
+
 func (s *VerifyTestSuite) TestVerifyWithChainTestnet() {
 	tests := map[string]verifier.SignedMessage{
 		"electrum - segwit native": {

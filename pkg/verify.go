@@ -24,7 +24,7 @@ func VerifyWithChain(signedMessage SignedMessage, net *chaincfg.Params) (bool, e
 	// This is required because Electrum trims messages before signing
 	if trimmedMessage := strings.TrimSpace(signedMessage.Message); len(signedMessage.Message) != len(trimmedMessage) {
 		// We only care about this return if it's valid
-		if verified, err := Verify(SignedMessage{Message: trimmedMessage, Address: signedMessage.Address, Signature: signedMessage.Signature}); err == nil && verified {
+		if verified, err := VerifyWithChain(SignedMessage{Message: trimmedMessage, Address: signedMessage.Address, Signature: signedMessage.Signature}, net); err == nil && verified {
 			return true, nil
 		}
 	}
