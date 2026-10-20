@@ -59,6 +59,7 @@ This specification is considered [legacy signing in BIP-322](https://github.com/
 - [Simple singing](https://github.com/bitcoin/bips/blob/master/bip-0322.mediawiki#simple)
   - P2WPKH - Native Segwit
   - P2TR - Taproot
+- Signatures that conform to the BIP-322 sighash rule: [SIGHASH_ALL](https://en.bitcoin.it/wiki/OP_CHECKSIG#Hash_Type_Byte), or SIGHASH_DEFAULT for taproot. Non-conformant signatures are rejected.
 
 #### Not supported
 
