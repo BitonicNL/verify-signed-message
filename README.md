@@ -1,4 +1,4 @@
-# Bitcoin Signed Message Verifier
+Help# Bitcoin Signed Message Verifier
 
 [![Latest tag](https://img.shields.io/github/tag/bitonicnl/verify-signed-message.svg)](https://github.com/bitonicnl/verify-signed-message/tags)
 ![Go Version](https://img.shields.io/badge/Go-%3E%3D%201.26.5-%23007d9c)
