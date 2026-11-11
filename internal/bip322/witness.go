@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/btcsuite/btcd/wire"
+	"github.com/btcsuite/btcd/wire/v2"
 )
 
 // This file is adapted from the btcd package (v0.26.0) message transaction (msgtx) implementation and babylon package (v4.5.0) bip322 implementation.

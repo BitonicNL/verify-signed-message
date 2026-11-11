@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/btcsuite/btcd/btcutil"
-	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcd/address/v2"
+	"github.com/btcsuite/btcd/chaincfg/v2"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitonicnl/verify-signed-message/internal/generic"
@@ -106,14 +106,14 @@ func (s *VerifyTestSuite) TestVerifyIncorrect() {
 	for name, tt := range tests {
 		s.Run(name, func() {
 			// Decode the address
-			address, err := btcutil.DecodeAddress(tt.signedMessage.Address, &chaincfg.MainNetParams)
+			addr, err := address.DecodeAddress(tt.signedMessage.Address, &chaincfg.MainNetParams)
 			s.Require().NoError(err)
 
 			// Decode the signature
 			signatureDecoded, err := base64.StdEncoding.DecodeString(tt.signedMessage.Signature)
 			s.Require().NoError(err)
 
-			valid, err := generic.Verify(address, tt.signedMessage.Message, signatureDecoded, &chaincfg.MainNetParams)
+			valid, err := generic.Verify(addr, tt.signedMessage.Message, signatureDecoded, &chaincfg.MainNetParams)
 			s.Require().EqualError(err, tt.expectedError)
 			s.Require().False(valid)
 		})
@@ -296,14 +296,14 @@ func (s *VerifyTestSuite) TestVerify() {
 	for name, tt := range tests {
 		s.Run(name, func() {
 			// Decode the address
-			address, err := btcutil.DecodeAddress(tt.Address, &chaincfg.MainNetParams)
+			addr, err := address.DecodeAddress(tt.Address, &chaincfg.MainNetParams)
 			s.Require().NoError(err)
 
 			// Decode the signature
 			signatureDecoded, err := base64.StdEncoding.DecodeString(tt.Signature)
 			s.Require().NoError(err)
 
-			valid, err := generic.Verify(address, tt.Message, signatureDecoded, &chaincfg.MainNetParams)
+			valid, err := generic.Verify(addr, tt.Message, signatureDecoded, &chaincfg.MainNetParams)
 			s.Require().NoError(err)
 			s.Require().True(valid)
 		})

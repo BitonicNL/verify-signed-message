@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/btcsuite/btcd/btcutil"
-	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcd/address/v2"
+	"github.com/btcsuite/btcd/chaincfg/v2"
 
 	"github.com/bitonicnl/verify-signed-message/internal/bip322"
 	"github.com/bitonicnl/verify-signed-message/internal/generic"
@@ -30,13 +30,13 @@ func VerifyWithChain(signedMessage SignedMessage, net *chaincfg.Params) (bool, e
 	}
 
 	// Decode the address
-	address, err := btcutil.DecodeAddress(signedMessage.Address, net)
+	addr, err := address.DecodeAddress(signedMessage.Address, net)
 	if err != nil {
 		return false, fmt.Errorf("could not decode address: %w", err)
 	}
 
 	// Ensure the address is valid for the passed network
-	if !address.IsForNet(net) {
+	if !addr.IsForNet(net) {
 		return false, fmt.Errorf("address '%s' is not valid for network '%s'", signedMessage.Address, net.Name)
 	}
 
@@ -56,10 +56,10 @@ func VerifyWithChain(signedMessage SignedMessage, net *chaincfg.Params) (bool, e
 	}
 
 	// Handle generic/BIP-137 signature. For P2PKH address, assume the signature is also a legacy signature
-	if _, ok := address.(*btcutil.AddressPubKeyHash); ok || len(signatureDecoded) == generic.ExpectedSignatureLength {
-		return generic.Verify(address, signedMessage.Message, signatureDecoded, net)
+	if _, ok := addr.(*address.AddressPubKeyHash); ok || len(signatureDecoded) == generic.ExpectedSignatureLength {
+		return generic.Verify(addr, signedMessage.Message, signatureDecoded, net)
 	}
 
 	// Otherwise, try and verify it as BIP-322
-	return bip322.Verify(address, signedMessage.Message, signatureDecoded)
+	return bip322.Verify(addr, signedMessage.Message, signatureDecoded)
 }

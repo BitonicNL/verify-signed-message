@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcd/chaincfg/v2"
 
 	"github.com/bitonicnl/verify-signed-message/pkg"
 )

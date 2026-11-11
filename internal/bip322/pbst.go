@@ -1,10 +1,10 @@
 package bip322
 
 import (
-	"github.com/btcsuite/btcd/btcutil"
-	"github.com/btcsuite/btcd/chaincfg/chainhash"
-	"github.com/btcsuite/btcd/txscript"
-	"github.com/btcsuite/btcd/wire"
+	"github.com/btcsuite/btcd/address/v2"
+	"github.com/btcsuite/btcd/chainhash/v2"
+	"github.com/btcsuite/btcd/txscript/v2"
+	"github.com/btcsuite/btcd/wire/v2"
 
 	"github.com/bitonicnl/verify-signed-message/internal"
 )
@@ -40,7 +40,7 @@ const (
 // BuildToSpendTx builds a toSpend transaction based on the BIP-322 spec. It requires the message that is signed and the address that produced the signature.
 //
 // For more details, refer: https://github.com/bitcoin/bips/blob/master/bip-0322.mediawiki#full
-func BuildToSpendTx(msg []byte, address btcutil.Address) (*wire.MsgTx, error) {
+func BuildToSpendTx(msg []byte, addr address.Address) (*wire.MsgTx, error) {
 	// Create a new transaction
 	psbt := wire.NewMsgTx(toSpendVersion)
 	psbt.LockTime = toSpendLockTime
@@ -64,7 +64,7 @@ func BuildToSpendTx(msg []byte, address btcutil.Address) (*wire.MsgTx, error) {
 	input.Sequence = toSpendInputSeq
 
 	// Create the output paying to the provided address
-	pkScript, err := txscript.PayToAddrScript(address)
+	pkScript, err := txscript.PayToAddrScript(addr)
 	if err != nil {
 		return nil, err
 	}

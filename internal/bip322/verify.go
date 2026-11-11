@@ -5,21 +5,21 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/btcsuite/btcd/address/v2"
 	"github.com/btcsuite/btcd/btcec/v2/schnorr"
-	"github.com/btcsuite/btcd/btcutil"
-	"github.com/btcsuite/btcd/txscript"
+	"github.com/btcsuite/btcd/txscript/v2"
 )
 
 // TODO: Check if we can implement more by referencing https://github.com/ACken2/bip322-js/blob/main/src/Verifier.ts#L23
-// Their implementation supports *btcutil.AddressScriptHash (but no multisig, yet).
-func Verify(address btcutil.Address, message string, signatureDecoded []byte) (bool, error) {
+// Their implementation supports *address.AddressScriptHash (but no multisig, yet).
+func Verify(addr address.Address, message string, signatureDecoded []byte) (bool, error) {
 	// Ensure we support the address
-	if !IsSupported(address) {
-		return false, fmt.Errorf("unsupported address type '%s'", reflect.TypeOf(address))
+	if !IsSupported(addr) {
+		return false, fmt.Errorf("unsupported address type '%s'", reflect.TypeOf(addr))
 	}
 
 	// Draft corresponding toSpend and toSign transaction using the message and script pubkey
-	toSpend, err := BuildToSpendTx([]byte(message), address)
+	toSpend, err := BuildToSpendTx([]byte(message), addr)
 	if err != nil {
 		return false, fmt.Errorf("could not build spending transaction: %w", err)
 	}
@@ -30,7 +30,7 @@ func Verify(address btcutil.Address, message string, signatureDecoded []byte) (b
 	}
 
 	// BIP-322 requires SIGHASH_ALL (or SIGHASH_DEFAULT for taproot), but the btcd engine accepts any sighash mode, so enforce the restriction ourselves.
-	if err := checkSigHash(address, witness); err != nil {
+	if err := checkSigHash(addr, witness); err != nil {
 		return false, err
 	}
 
@@ -64,7 +64,7 @@ func Verify(address btcutil.Address, message string, signatureDecoded []byte) (b
 }
 
 // checkSigHash enforces BIP-322's sighash restriction for the supported (P2WPKH and P2TR key-path) output types: SIGHASH_ALL is required, except taproot which also accepts SIGHASH_DEFAULT.
-func checkSigHash(address btcutil.Address, witness [][]byte) error {
+func checkSigHash(addr address.Address, witness [][]byte) error {
 	if len(witness) == 0 {
 		return nil
 	}
@@ -75,16 +75,16 @@ func checkSigHash(address btcutil.Address, witness [][]byte) error {
 		return nil
 	}
 
-	switch address.(type) {
+	switch addr.(type) {
 	// P2WPKH: ECDSA signature with an explicit trailing sighash byte.
-	case *btcutil.AddressWitnessPubKeyHash:
+	case *address.AddressWitnessPubKeyHash:
 		hashType := txscript.SigHashType(rawSig[len(rawSig)-1])
 		if hashType != txscript.SigHashAll {
 			return fmt.Errorf("invalid signature: BIP-322 requires SIGHASH_ALL for P2WPKH, got sighash type 0x%02x", hashType)
 		}
 
 	// P2TR: Schnorr signature, 64 bytes (implicit SIGHASH_DEFAULT) or 65 bytes with an explicit trailing sighash byte.
-	case *btcutil.AddressTaproot:
+	case *address.AddressTaproot:
 		hashType := txscript.SigHashDefault
 		if len(rawSig) == schnorr.SignatureSize+1 {
 			hashType = txscript.SigHashType(rawSig[schnorr.SignatureSize])
@@ -97,13 +97,13 @@ func checkSigHash(address btcutil.Address, witness [][]byte) error {
 	return nil
 }
 
-func IsSupported(address btcutil.Address) bool {
-	switch address.(type) {
+func IsSupported(addr address.Address) bool {
+	switch addr.(type) {
 	// P2WPKH - Native Segwit
-	case *btcutil.AddressWitnessPubKeyHash:
+	case *address.AddressWitnessPubKeyHash:
 		return true
 	// P2TR - Taproot
-	case *btcutil.AddressTaproot:
+	case *address.AddressTaproot:
 		return true
 	default:
 		return false

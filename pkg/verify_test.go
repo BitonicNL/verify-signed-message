@@ -3,7 +3,7 @@ package verifier_test
 import (
 	"testing"
 
-	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcd/chaincfg/v2"
 	"github.com/stretchr/testify/suite"
 
 	verifier "github.com/bitonicnl/verify-signed-message/pkg"

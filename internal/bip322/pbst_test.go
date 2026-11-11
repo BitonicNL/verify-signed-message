@@ -3,8 +3,8 @@ package bip322_test
 import (
 	"testing"
 
-	"github.com/btcsuite/btcd/btcutil"
-	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcd/address/v2"
+	"github.com/btcsuite/btcd/chaincfg/v2"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitonicnl/verify-signed-message/internal/bip322"
@@ -15,7 +15,7 @@ func TestGetToSignTx(t *testing.T) {
 	t.Parallel()
 
 	testAddr := "bc1q9vza2e8x573nczrlzms0wvx3gsqjx7vavgkx0l"
-	testAddrDecoded, err := btcutil.DecodeAddress(testAddr, &chaincfg.TestNet3Params)
+	testAddrDecoded, err := address.DecodeAddress(testAddr, &chaincfg.TestNet3Params)
 	require.NoError(t, err)
 
 	toSpendTx, err := bip322.BuildToSpendTx([]byte{}, testAddrDecoded)

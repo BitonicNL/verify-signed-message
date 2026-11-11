@@ -6,10 +6,10 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/btcsuite/btcd/address/v2"
 	"github.com/btcsuite/btcd/btcec/v2"
-	"github.com/btcsuite/btcd/btcutil"
-	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/btcsuite/btcd/txscript"
+	"github.com/btcsuite/btcd/chaincfg/v2"
+	"github.com/btcsuite/btcd/txscript/v2"
 	"github.com/decred/dcrd/dcrec/secp256k1/v4"
 	"github.com/stretchr/testify/suite"
 
@@ -46,7 +46,7 @@ func (s *ValidateTestSuite) TestValidateP2PKH() {
 	type args struct {
 		recoveryFlag int
 		pubKeyHash   []byte
-		addr         btcutil.Address
+		addr         address.Address
 	}
 	tests := []struct {
 		name string
@@ -96,7 +96,7 @@ func (s *ValidateTestSuite) TestValidateP2SH() {
 	type args struct {
 		recoveryFlag int
 		pubKeyHash   []byte
-		addr         btcutil.Address
+		addr         address.Address
 	}
 	tests := []struct {
 		name string
@@ -142,7 +142,7 @@ func (s *ValidateTestSuite) TestValidateP2WPKH() {
 	type args struct {
 		recoveryFlag int
 		witnessProg  []byte
-		addr         btcutil.Address
+		addr         address.Address
 	}
 	tests := []struct {
 		name string
@@ -184,7 +184,7 @@ func (s *ValidateTestSuite) TestValidateP2TR() {
 	type args struct {
 		recoveryFlag int
 		pubKey       *btcec.PublicKey
-		addr         btcutil.Address
+		addr         address.Address
 	}
 	tests := []struct {
 		name string
@@ -253,7 +253,7 @@ func (s *ValidateTestSuite) createTaprootPublicKey(publicKey string) *btcec.Publ
 	return btcec.NewPublicKey(x, y)
 }
 
-// RandomAddress implements the btcutil.Address interface and serves as a no-op to test these calls.
+// RandomAddress implements the address.Address interface and serves as a no-op to test these calls.
 type RandomAddress struct {
 	Address string
 }

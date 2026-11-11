@@ -5,11 +5,11 @@ import (
 	"encoding/base64"
 	"testing"
 
+	"github.com/btcsuite/btcd/address/v2"
 	"github.com/btcsuite/btcd/btcec/v2"
-	"github.com/btcsuite/btcd/btcutil"
-	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/btcsuite/btcd/txscript"
-	"github.com/btcsuite/btcd/wire"
+	"github.com/btcsuite/btcd/chaincfg/v2"
+	"github.com/btcsuite/btcd/txscript/v2"
+	"github.com/btcsuite/btcd/wire/v2"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitonicnl/verify-signed-message/internal/bip322"
@@ -57,7 +57,7 @@ func (s *VerifyTestSuite) TestVerifyIncorrect() {
 				Message:   "Hello World",
 				Signature: "AkgwRQIhAMd2wZSY3x0V9Kr/NClochoTXcgDaGl3OObOR17yx3QQAiBVWxqNSS+CKen7bmJTG6YfJjsggQ4Fa2RHKgBKrdQQ+gEhAxa5UDdQCHSQHfKQv14ybcYm1C9y6b12xAuukWzSnS+w\n",
 			},
-			expectedError: "unsupported address type '*btcutil.AddressScriptHash'",
+			expectedError: "unsupported address type '*address.AddressScriptHash'",
 		},
 		// Taken from https://github.com/ACken2/bip322-js/blob/159456f44f31f0b38097b957bbe75c0eae4971bf/test/Verifier.test.ts#L302
 		"taproot - script-spend": {
@@ -84,7 +84,7 @@ func (s *VerifyTestSuite) TestVerifyIncorrect() {
 				Message:   "This will be a p2sh 2-of-3 multisig BIP 322 signed message",
 				Signature: "AAAAAAHNcfHaNfl8f/+ZC2gTr8aF+0KgppYjKM94egaNm/u1ZAAAAAD8AEcwRAIhAJ6hdj61vLDP+aFa30qUZQmrbBfE0kiOObYvt5nqPSxsAh9IrOKFwflfPRUcQ/5e0REkdFHVP2GGdUsMgDet+sNlAUcwRAIgH3eW/VyFDoXvCasd8qxgwj5NDVo0weXvM6qyGXLCR5YCIEwjbEV6fS6RWP6QsKOcMwvlGr1/SgdCC6pW4eH87/YgAUxpUiECKJfGy28imLcuAeNBLHCNv3NRP5jnJwFDNRXCYNY/vJ4hAv1RQtaZs7+vKqQeWl2rb/jd/gMxkEjUnjZdDGPDZkMLIQL65cH2X5O7LujjTLDL2l8Pxy0Y2UUR99u1qCfjdz7dklOuAAAAAAEAAAAAAAAAAAFqAAAAAA==",
 			},
-			expectedError: "unsupported address type '*btcutil.AddressScriptHash'",
+			expectedError: "unsupported address type '*address.AddressScriptHash'",
 		},
 		// Taken from https://github.com/luke-jr/bitcoin/blob/9ab7b8ada61a5f558c92c3eb9fd3cd3625d8cc09/src/test/util_tests.cpp#L1743
 		"p2wsh - 3-of-3 multisig": {
@@ -93,7 +93,7 @@ func (s *VerifyTestSuite) TestVerifyIncorrect() {
 				Message:   "This will be a p2wsh 3-of-3 multisig BIP 322 signed message",
 				Signature: "BQBIMEUCIQDQoXvGKLH58exuujBOta+7+GN7vi0lKwiQxzBpuNuXuAIgIE0XYQlFDOfxbegGYYzlf+tqegleAKE6SXYIa1U+uCcBRzBEAiATegywVl6GWrG9jJuPpNwtgHKyVYCX2yfuSSDRFATAaQIgTLlU6reLQsSIrQSF21z3PtUO2yAUseUWGZqRUIE7VKoBSDBFAiEAgxtpidsU0Z4u/+5RB9cyeQtoCW5NcreLJmWXZ8kXCZMCIBR1sXoEinhZE4CF9P9STGIcMvCuZjY6F5F0XTVLj9SjAWlTIQP3dyWvTZjUENWJowMWBsQrrXCUs20Gu5YF79CG5Ga0XSEDwqI5GVBOuFkFzQOGH5eTExSAj2Z/LDV/hbcvAPQdlJMhA17FuuJd+4wGuj+ZbVxEsFapTKAOwyhfw9qpch52JKxbU64=",
 			},
-			expectedError: "unsupported address type '*btcutil.AddressWitnessScriptHash'",
+			expectedError: "unsupported address type '*address.AddressWitnessScriptHash'",
 		},
 		"Pay-to-Witness-Script-Hash - P2WSH": {
 			signedMessage: verifier.SignedMessage{
@@ -101,21 +101,21 @@ func (s *VerifyTestSuite) TestVerifyIncorrect() {
 				Message:   "doesn't matter",
 				Signature: "ZG9lc24ndCBtYXR0ZXI=",
 			},
-			expectedError: "unsupported address type '*btcutil.AddressWitnessScriptHash'",
+			expectedError: "unsupported address type '*address.AddressWitnessScriptHash'",
 		},
 	}
 
 	for name, tt := range tests {
 		s.Run(name, func() {
 			// Decode the address
-			address, err := btcutil.DecodeAddress(tt.signedMessage.Address, &chaincfg.MainNetParams)
+			addr, err := address.DecodeAddress(tt.signedMessage.Address, &chaincfg.MainNetParams)
 			s.Require().NoError(err)
 
 			// Decode the signature
 			signatureDecoded, err := base64.StdEncoding.DecodeString(tt.signedMessage.Signature)
 			s.Require().NoError(err)
 
-			valid, err := bip322.Verify(address, tt.signedMessage.Message, signatureDecoded)
+			valid, err := bip322.Verify(addr, tt.signedMessage.Message, signatureDecoded)
 			s.Require().EqualError(err, tt.expectedError)
 			s.Require().False(valid)
 		})
@@ -272,14 +272,14 @@ func (s *VerifyTestSuite) TestVerify() {
 	for name, tt := range tests {
 		s.Run(name, func() {
 			// Decode the address
-			address, err := btcutil.DecodeAddress(tt.Address, &chaincfg.MainNetParams)
+			addr, err := address.DecodeAddress(tt.Address, &chaincfg.MainNetParams)
 			s.Require().NoError(err)
 
 			// Decode the signature
 			signatureDecoded, err := base64.StdEncoding.DecodeString(tt.Signature)
 			s.Require().NoError(err)
 
-			valid, err := bip322.Verify(address, tt.Message, signatureDecoded)
+			valid, err := bip322.Verify(addr, tt.Message, signatureDecoded)
 			s.Require().NoError(err)
 			s.Require().True(valid)
 		})
@@ -297,9 +297,9 @@ func (s *VerifyTestSuite) serializeSimpleSig(witness wire.TxWitness) []byte {
 	return buf.Bytes()
 }
 
-func (s *VerifyTestSuite) p2wpkhAddress(priv *btcec.PrivateKey) *btcutil.AddressWitnessPubKeyHash {
-	addr, err := btcutil.NewAddressWitnessPubKeyHash(
-		btcutil.Hash160(priv.PubKey().SerializeCompressed()),
+func (s *VerifyTestSuite) p2wpkhAddress(priv *btcec.PrivateKey) *address.AddressWitnessPubKeyHash {
+	addr, err := address.NewAddressWitnessPubKeyHash(
+		address.Hash160(priv.PubKey().SerializeCompressed()),
 		&chaincfg.MainNetParams,
 	)
 	s.Require().NoError(err)
@@ -307,9 +307,9 @@ func (s *VerifyTestSuite) p2wpkhAddress(priv *btcec.PrivateKey) *btcutil.Address
 	return addr
 }
 
-func (s *VerifyTestSuite) p2trAddress(priv *btcec.PrivateKey) *btcutil.AddressTaproot {
+func (s *VerifyTestSuite) p2trAddress(priv *btcec.PrivateKey) *address.AddressTaproot {
 	internalKey := txscript.ComputeTaprootKeyNoScript(priv.PubKey())
-	addr, err := btcutil.NewAddressTaproot(
+	addr, err := address.NewAddressTaproot(
 		internalKey.SerializeCompressed()[1:], &chaincfg.MainNetParams,
 	)
 	s.Require().NoError(err)

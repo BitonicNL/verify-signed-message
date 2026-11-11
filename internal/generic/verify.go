@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/btcsuite/btcd/address/v2"
 	"github.com/btcsuite/btcd/btcec/v2/ecdsa"
-	"github.com/btcsuite/btcd/btcutil"
-	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/btcsuite/btcd/chaincfg/chainhash"
+	"github.com/btcsuite/btcd/chaincfg/v2"
+	"github.com/btcsuite/btcd/chainhash/v2"
 	"github.com/samber/lo"
 
 	"github.com/bitonicnl/verify-signed-message/internal"
@@ -19,7 +19,7 @@ import (
 // ExpectedSignatureLength contains the fixed signature length all signed messages are expected to have.
 const ExpectedSignatureLength = 65
 
-func Verify(address btcutil.Address, message string, signatureDecoded []byte, net *chaincfg.Params) (bool, error) {
+func Verify(addr address.Address, message string, signatureDecoded []byte, net *chaincfg.Params) (bool, error) {
 	// Ensure signature has proper length
 	if len(signatureDecoded) != ExpectedSignatureLength {
 		return false, fmt.Errorf("wrong signature length: %d instead of %d", len(signatureDecoded), ExpectedSignatureLength)
@@ -66,21 +66,21 @@ func Verify(address btcutil.Address, message string, signatureDecoded []byte, ne
 	// Get the hash from the public key, so we can check that address matches
 	publicKeyHash := GeneratePublicKeyHash(recoveryFlag, publicKey)
 
-	switch address.(type) {
+	switch addr.(type) {
 	// Validate P2PKH - Legacy
-	case *btcutil.AddressPubKeyHash:
-		return ValidateP2PKH(recoveryFlag, publicKeyHash, address, net)
+	case *address.AddressPubKeyHash:
+		return ValidateP2PKH(recoveryFlag, publicKeyHash, addr, net)
 	// Validate P2SH-P2WPKH - Segwit
-	case *btcutil.AddressScriptHash:
-		return ValidateP2SH(recoveryFlag, publicKeyHash, address, net)
+	case *address.AddressScriptHash:
+		return ValidateP2SH(recoveryFlag, publicKeyHash, addr, net)
 	// Validate P2WPKH - Native Segwit
-	case *btcutil.AddressWitnessPubKeyHash:
-		return ValidateP2WPKH(recoveryFlag, publicKeyHash, address, net)
+	case *address.AddressWitnessPubKeyHash:
+		return ValidateP2WPKH(recoveryFlag, publicKeyHash, addr, net)
 	// Validate P2TR - Taproot
-	case *btcutil.AddressTaproot:
-		return ValidateP2TR(recoveryFlag, publicKey, address, net)
+	case *address.AddressTaproot:
+		return ValidateP2TR(recoveryFlag, publicKey, addr, net)
 	// Unsupported address
 	default:
-		return false, fmt.Errorf("unsupported address type '%s'", reflect.TypeOf(address))
+		return false, fmt.Errorf("unsupported address type '%s'", reflect.TypeOf(addr))
 	}
 }
